@@ -66,12 +66,17 @@ SemSync decouples real-time editing from semantic analysis using a 4-layer archi
 
 ```text
 SemSync/
-├── client/                     # Frontend Vite application
+├── client/                     # React + ProseMirror + Automerge app (Vite)
+│   ├── index.html              # The app
+│   ├── design-system.html      # Browser-viewable design system
+│   ├── prototype/              # Original dual-view prototype (reference only)
 │   ├── src/
-│   │   ├── editor/             # Editor view & Automerge bindings
-│   │   ├── conflicts/          # Decorations, cursor flags & conflict store
-│   │   ├── components/         # Shared UI components
-│   │   └── services/           # WebSocket client connection
+│   │   ├── components/         # ui/, editor/, semantic/, collaboration/, documents/
+│   │   ├── features/           # Screens: auth, onboarding, workspace, editor
+│   │   ├── demo/               # Evaluator demo scenarios (DEMO_MODE)
+│   │   ├── lib/                # Repo, document index, router, session, theme
+│   │   ├── styles/             # tokens.css and per-domain styles
+│   │   └── design-system/      # Design system page
 │   ├── package.json
 │   └── vite.config.js
 │
@@ -102,6 +107,8 @@ SemSync/
 ├── package.json                # Root npm workspace
 └── README.md
 ```
+
+Before changing the client, read [docs/CHANGE-GUIDE.md](docs/CHANGE-GUIDE.md).
 
 ---
 

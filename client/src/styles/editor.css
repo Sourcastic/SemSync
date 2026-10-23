@@ -1,0 +1,359 @@
+/* Editor: app bar, menu bar, formatting toolbar, canvas/page, document typography, presence. */
+
+/* ---------- Editor screen: app bar, toolbar, then the scrolling workspace ---------- */
+.editor-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--surface-canvas);
+}
+
+.page-loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ---------- App bar (title row + menu row, Docs-style) ---------- */
+.app-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--appbar-h);
+  padding: var(--space-1) var(--space-3) 0 var(--space-2);
+  background: var(--surface-canvas);
+}
+
+.app-bar-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.app-bar-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.app-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+/* Editable title: looks like text until hovered/focused */
+.doc-title-input {
+  min-width: 0;
+  max-width: 420px;
+  height: var(--control-h-sm);
+  padding: 0 var(--space-1);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--text-xl);
+  text-overflow: ellipsis;
+  transition: border-color var(--motion-fast) ease;
+}
+
+.doc-title-input:hover {
+  border-color: var(--border-default);
+}
+
+.doc-title-input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+
+@media (max-width: 960px) {
+  .app-bar-folder {
+    display: none; /* the title needs the room more */
+  }
+}
+
+/* Phones: drop the menu bar (the toolbar keeps formatting) and secondary chrome so the title fits */
+@media (max-width: 600px) {
+  .app-bar {
+    gap: var(--space-1);
+    padding-inline: var(--space-1) var(--space-2);
+  }
+
+  .app-bar .menubar,
+  .app-bar .sync-status:not([data-state="offline"]):not([data-state="reconnecting"]) .sync-label,
+  .app-bar .split-button > .button:last-child {
+    display: none;
+  }
+
+  .app-bar .split-button > .button:first-child {
+    min-width: 0;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-full);
+  }
+
+  .app-bar-actions {
+    gap: var(--space-1);
+  }
+}
+
+/* ---------- Menu bar ---------- */
+.menubar {
+  display: flex;
+  align-items: center;
+  margin-left: calc(-1 * var(--space-1));
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.menubar-item {
+  height: var(--control-h-xs);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--text-md);
+  transition: background-color var(--motion-fast) ease;
+}
+
+.menubar-item:hover,
+.menubar-item[aria-expanded="true"] {
+  background: var(--surface-hover);
+}
+
+/* Your own avatar, far right of the top bar (like familiar editors) */
+.app-bar-self {
+  display: inline-flex;
+  margin-left: var(--space-1);
+  border-radius: 50%;
+}
+
+/* Presence avatars: plain buttons around avatars (click to jump to that cursor) */
+.presence-avatar {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+
+/* ---------- Formatting toolbar ---------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: var(--control-h-lg);
+  margin: var(--space-2) var(--space-3);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--surface-toolbar);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar-separator {
+  flex-shrink: 0;
+  width: 1px;
+  height: 20px;
+  margin: 0 var(--space-1);
+  background: var(--border-default);
+}
+
+.toolbar .select-trigger {
+  height: var(--control-h-sm);
+  font-size: var(--text-sm);
+}
+
+/* ---------- Workspace (outline | canvas | review) ---------- */
+.editor-workspace {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  background: var(--surface-canvas);
+}
+
+.editor-canvas {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  padding: var(--space-4) var(--space-4) var(--space-12);
+}
+
+.page {
+  position: relative; /* anchors gutter markers */
+  width: var(--page-w);
+  max-width: 100%;
+  min-height: 1056px; /* US Letter at 96dpi */
+  margin: 0 auto;
+  padding: var(--page-pad-y) var(--page-pad-x);
+  border: 1px solid var(--border-page);
+  background: var(--surface-page);
+}
+
+@media (max-width: 860px) {
+  .page {
+    --page-pad-x: var(--space-8);
+    --page-pad-y: var(--space-10);
+    min-height: auto;
+  }
+}
+
+/* ---------- Document typography (applies to the ProseMirror root) ---------- */
+.doc-content {
+  color: var(--text-primary);
+  font-family: var(--font-doc);
+  font-size: var(--text-base);
+  line-height: var(--leading-doc);
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.doc-content p {
+  margin: 0 0 var(--space-3);
+}
+
+.doc-content h1,
+.doc-content h2,
+.doc-content h3 {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+}
+
+.doc-content h1 {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-3xl);
+}
+
+.doc-content h2 {
+  margin: var(--space-6) 0 var(--space-2);
+  font-size: var(--text-2xl);
+}
+
+.doc-content h3 {
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-medium);
+}
+
+.doc-content ul,
+.doc-content ol {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-6);
+}
+
+.doc-content > * {
+  scroll-margin-top: var(--space-8);
+}
+
+.doc-content li > p {
+  margin-bottom: var(--space-1);
+}
+
+.doc-content a {
+  text-decoration: underline;
+}
+
+.doc-content ::selection {
+  background: var(--accent-subtle);
+}
+
+.doc-content hr {
+  margin: var(--space-4) 0;
+  border: 0;
+  border-top: 1px solid var(--border-default);
+}
+
+.doc-content blockquote {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--border-default);
+  color: var(--text-secondary);
+}
+
+.doc-content code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+/* Empty-document placeholder (decoration from createEditor) */
+.doc-content .is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.doc-content:focus-visible {
+  outline: none; /* the caret is the focus indicator inside the page */
+}
+
+.doc-content .ProseMirror-selectednode {
+  outline: 2px solid var(--focus-ring);
+}
+
+/* Page + right margin rail: semantic cards sit beside the text they refer to, like Docs comments */
+.doc-layout {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.doc-layout > .page {
+  margin: 0;
+}
+
+.margin-rail {
+  position: relative; /* cards are positioned at their anchor's offset */
+  width: var(--margin-rail-w);
+  flex-shrink: 0;
+}
+
+@media (max-width: 1179px) {
+  .margin-rail {
+    display: none; /* the Review panel takes over */
+  }
+}
+
+/* ---------- Collaborator presence (ProseMirror decorations) ---------- */
+.collab-caret {
+  position: relative;
+  margin: 0 -1px;
+  border-left: 2px solid var(--collab-color);
+  pointer-events: none;
+}
+
+.collab-caret-label {
+  position: absolute;
+  bottom: 100%;
+  left: -2px;
+  padding: 1px var(--space-1);
+  border-radius: var(--radius-sm) var(--radius-sm) var(--radius-sm) 0;
+  background: var(--collab-color);
+  color: var(--avatar-fg);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  line-height: var(--leading-tight);
+  white-space: nowrap;
+  transition: opacity var(--motion-normal) ease;
+}
+
+/* Name label fades once the collaborator has been idle */
+.collab-caret[data-idle] .collab-caret-label {
+  opacity: 0;
+}
+
+.collab-selection {
+  background: color-mix(in srgb, var(--collab-color) 20%, transparent);
+}

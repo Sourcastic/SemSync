@@ -1,0 +1,258 @@
+/*
+ * SemSync design tokens: the only place raw values live.
+ * Components reference semantic tokens (--text-*, --surface-*, ...), never the palette directly.
+ * Dark mode overrides semantic tokens only; component styles are never duplicated per theme.
+ */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* ---------- Palette (raw, do not use in components) ---------- */
+  --smart-blue: #0466c8;
+  --sapphire: #0353a4;
+  --regal-navy: #023e7d;
+  --prussian-blue: #002855;
+  --prussian-blue-2: #001845;
+  --prussian-blue-3: #001233;
+  --twilight-indigo: #33415c;
+  --blue-slate: #5c677d;
+  --slate-grey: #7d8597;
+  --lavender-grey: #979dac;
+
+  /* Cool tints derived from the same hue, for light surfaces */
+  --navy-50: #f3f5f9;
+  --navy-100: #ebeef4;
+  --navy-150: #e2e7ef;
+  --navy-200: #d4dae4;
+  --navy-300: #b9c1cf;
+  --ink: #172033;
+
+  /* ---------- Typography ---------- */
+  --font-sans: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+  --font-doc: Arial, Helvetica, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-base: 15px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.45;
+  --leading-doc: 1.6;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+
+  /* ---------- Spacing (4px base) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ---------- Radii ---------- */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 999px;
+
+  /* ---------- Control dimensions ---------- */
+  --control-h-xs: 24px;
+  --control-h-sm: 28px;
+  --control-h-md: 32px;
+  --control-h: 36px;
+  --control-h-lg: 40px;
+  --row-h: 48px;
+  --appbar-h: 56px;
+  --icon-sm: 18px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --button-min-w: 96px;
+  --button-min-w-sm: 72px;
+  --margin-rail-w: 280px;
+  --avatar-xs: 20px;
+  --avatar-sm: 24px;
+  --avatar-md: 28px;
+  --avatar-lg: 32px;
+
+  /* ---------- Layout / editor dimensions ---------- */
+  --sidebar-w: 256px;
+  --sidebar-w-collapsed: 64px;
+  --review-w: 320px;
+  --page-w: 816px;
+  --page-pad-x: 96px;
+  --page-pad-y: 72px;
+  --popover-w: 380px;
+  --menu-min-w: 200px;
+  --dialog-w: 480px;
+  --theme-preview-h: 88px;
+
+  /* ---------- Z-index ---------- */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-toolbar: 20;
+  --z-modal: 30;
+  --z-dropdown: 40; /* above dialogs: menus and selects can open from inside one */
+  --z-popover: 50;
+  --z-toast: 60;
+
+  /* ---------- Motion (transitions only, no animation) ---------- */
+  --motion-instant: 80ms;
+  --motion-fast: 120ms;
+  --motion-normal: 160ms;
+  --motion-panel: 220ms; /* sidebar and Review panel open/close */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ---------- Semantic: text ---------- */
+  --text-primary: var(--ink);
+  --text-secondary: var(--blue-slate);
+  --text-muted: var(--slate-grey);
+  --text-disabled: var(--lavender-grey);
+  --text-on-accent: #ffffff;
+  --text-link: var(--smart-blue);
+
+  /* ---------- Semantic: surfaces ---------- */
+  --surface-base: #ffffff;        /* main content, home list */
+  --surface-sidebar: var(--navy-50);
+  --surface-canvas: var(--navy-50); /* editor workspace around the page */
+  --surface-page: #ffffff;
+  --surface-toolbar: var(--navy-100);
+  --surface-raised: #ffffff;      /* menus, popovers, dialogs */
+  --surface-field: #ffffff;
+  --surface-sunken: var(--navy-50);
+  --surface-hover: var(--navy-100);
+  --surface-pressed: var(--navy-150);
+  --surface-selected: var(--navy-150);
+  --surface-inverse: var(--ink);
+  --text-inverse: #f3f5f9;
+  --overlay: rgb(0 18 51 / 0.32);
+
+  /* ---------- Semantic: borders ---------- */
+  --border-subtle: var(--navy-150);
+  --border-default: var(--navy-200);
+  --border-strong: var(--navy-300);
+  --border-page: var(--navy-200);
+
+  /* ---------- Semantic: accent ---------- */
+  --accent: var(--smart-blue);
+  --accent-hover: var(--sapphire);
+  --accent-active: var(--regal-navy);
+  --accent-subtle: #dbe8f8;
+  --accent-subtle-hover: #cbdcf3;
+  --accent-subtle-text: var(--sapphire);
+  --focus-ring: var(--smart-blue);
+
+  /* ---------- Semantic: states ---------- */
+  --conflict: #c4553b;            /* muted coral: text and icons */
+  --conflict-line: #d9735a;       /* underline + gutter */
+  --conflict-tint: #fcefeb;
+  --conflict-tint-strong: #f8dcd4;
+
+  --grammar: #6a4fbf;             /* muted violet, distinct from coral for color-vision deficiency */
+  --grammar-line: #8a6fd6;
+  --grammar-tint: #f2eefb;
+
+  --success: #1f7a52;
+  --success-tint: #e6f3ec;
+  --warning: #9a5b00;
+  --warning-tint: #fcf2e1;
+  --danger: #b42318;
+  --danger-tint: #fdeceb;
+  --danger-solid: #b42318;
+
+  /* ---------- Collaborators (stable per user) ---------- */
+  --collab-eshaal: var(--smart-blue);
+  --collab-atika: #0f7f72;
+  --collab-ibrahim: #9a6200;
+  /* Other people (new accounts, guests): picked by a stable hash of their id */
+  --collab-extra-1: #b8327a;
+  --collab-extra-2: #3b7d23;
+  --collab-extra-3: #0e7490;
+  --collab-extra-4: #8a5a3c;
+  --avatar-fg: #ffffff;
+  --avatar-neutral: var(--navy-200);
+
+  /* ---------- Elevation (floating layers only) ---------- */
+  /* Two-layer key + ambient shadows (Material-style elevation), tinted navy */
+  --shadow-popover: 0 1px 2px 0 rgb(0 18 51 / 0.24), 0 2px 6px 2px rgb(0 18 51 / 0.12);
+  --shadow-dialog: 0 1px 3px 0 rgb(0 18 51 / 0.24), 0 4px 8px 3px rgb(0 18 51 / 0.12);
+}
+
+/* Dark: deep navy surfaces, soft white text, cool blue-grey secondary. Not an inversion. */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --text-primary: #e4e8f0;
+  --text-secondary: #a9b1c2;
+  --text-muted: var(--lavender-grey);
+  --text-disabled: var(--blue-slate);
+  --text-link: #6aaef2;
+
+  --surface-base: #071833;
+  --surface-sidebar: var(--prussian-blue-3);
+  --surface-canvas: var(--prussian-blue-3);
+  --surface-page: #071a38;
+  --surface-toolbar: #0d2142;
+  --surface-raised: #0e2346;
+  --surface-field: #061630;
+  --surface-sunken: #04122b;
+  --surface-hover: #142a4f;
+  --surface-pressed: #1b3460;
+  --surface-selected: #183056;
+  --surface-inverse: #e4e8f0;
+  --text-inverse: var(--prussian-blue-3);
+  --overlay: rgb(0 6 20 / 0.6);
+
+  --border-subtle: #13284a;
+  --border-default: #1d3459;
+  --border-strong: var(--twilight-indigo);
+  --border-page: #15294b;
+
+  --accent: #2a7fd6;
+  --accent-hover: #3d8fe2;
+  --accent-active: var(--smart-blue);
+  --accent-subtle: #10305c;
+  --accent-subtle-hover: #163c70;
+  --accent-subtle-text: #8cc0f5;
+  --focus-ring: #5aa2ee;
+
+  --conflict: #f0a08c;
+  --conflict-line: #e5826a;
+  --conflict-tint: rgb(229 130 106 / 0.12);
+  --conflict-tint-strong: rgb(229 130 106 / 0.24);
+
+  --grammar: #b8a4f2;
+  --grammar-line: #9f88ea;
+  --grammar-tint: rgb(159 136 234 / 0.12);
+
+  --success: #62c79c;
+  --success-tint: rgb(98 199 156 / 0.12);
+  --warning: #f0b45a;
+  --warning-tint: rgb(240 180 90 / 0.12);
+  --danger: #f2867c;
+  --danger-tint: rgb(242 134 124 / 0.12);
+  --danger-solid: #c2392f;
+
+  --collab-eshaal: #5aa2ee;
+  --collab-atika: #3fbfae;
+  --collab-ibrahim: #e0a63e;
+  --collab-extra-1: #e57bb4;
+  --collab-extra-2: #86c76a;
+  --collab-extra-3: #4cc3dc;
+  --collab-extra-4: #d3a07c;
+  --avatar-fg: var(--prussian-blue-3);
+  --avatar-neutral: var(--twilight-indigo);
+  --shadow-popover: 0 1px 2px 0 rgb(0 0 0 / 0.5), 0 2px 6px 2px rgb(0 0 0 / 0.3);
+  --shadow-dialog: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 4px 8px 3px rgb(0 0 0 / 0.3);
+}

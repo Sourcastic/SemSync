@@ -1,0 +1,519 @@
+/*
+ * Semantic layer: in-text decorations, gutter marker, conflict popover, review panel.
+ * Conflict = coral, solid underline + faint tint + gutter bar.
+ * Grammar  = violet, dotted underline, no tint.
+ * Style differs, not just color, so meaning survives color-vision deficiency.
+ */
+
+/* ---------- Inline decorations ---------- */
+.sem-conflict {
+  background: var(--conflict-tint);
+  text-decoration: underline solid var(--conflict-line);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-skip-ink: none;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) ease;
+}
+
+.sem-conflict:hover,
+.sem-conflict[data-active] {
+  background: var(--conflict-tint-strong);
+}
+
+.sem-grammar {
+  text-decoration: underline dotted var(--grammar-line);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-skip-ink: none;
+  cursor: pointer;
+}
+
+.sem-grammar:hover,
+.sem-grammar[data-active] {
+  background: var(--grammar-tint);
+}
+
+/* Stale results keep their place but lose emphasis */
+.sem-conflict[data-stale],
+.sem-grammar[data-stale] {
+  background: transparent;
+  text-decoration-style: dashed;
+  text-decoration-color: var(--text-muted);
+}
+
+/* Gutter marker: node decoration adds .sem-has-conflict to the block */
+.sem-has-conflict {
+  position: relative;
+}
+
+.sem-has-conflict::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  right: calc(-1 * var(--space-6));
+  width: 3px;
+  border-radius: var(--radius-full);
+  background: var(--conflict-line);
+}
+
+/* Small swatch repeating the in-text treatment, used in review rows and legends */
+.sem-swatch {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 12px;
+  height: 0;
+  border-bottom: 2px solid var(--conflict-line);
+}
+
+.sem-swatch[data-kind="grammar"] {
+  border-bottom-style: dotted;
+  border-bottom-color: var(--grammar-line);
+}
+
+.sem-swatch[data-kind="resolved"] {
+  border-bottom-color: var(--success);
+}
+
+.sem-swatch[data-kind="muted"] {
+  border-bottom-style: dashed;
+  border-bottom-color: var(--text-muted);
+}
+
+/* ---------- Margin card (collapsed issue in the right rail) ---------- */
+.margin-card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+}
+
+.margin-card:hover {
+  background: var(--surface-hover);
+}
+
+.margin-card[data-expanded] {
+  padding: var(--space-4);
+  cursor: default;
+  box-shadow: var(--shadow-popover);
+  z-index: var(--z-sticky);
+}
+
+.margin-card[data-expanded]:hover {
+  background: var(--surface-raised);
+}
+
+/* ---------- Conflict popover content ---------- */
+.conflict-popover {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.conflict-popover-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.conflict-popover-header > div {
+  flex: 1;
+}
+
+.conflict-popover-title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+}
+
+.conflict-popover-desc {
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.version-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.version {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--collab-color, var(--border-strong));
+}
+
+.version-author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+}
+
+.version-author .button {
+  margin-left: auto;
+}
+
+.version-text {
+  font-family: var(--font-doc);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+}
+
+.version-text ins {
+  text-decoration: none;
+  background: color-mix(in srgb, var(--collab-color, var(--accent)) 16%, transparent);
+}
+
+/* Technical NLP detail, collapsed by default (native <details>) */
+.analysis-details {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.analysis-details summary {
+  cursor: pointer;
+  color: var(--text-secondary);
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.analysis-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.analysis-details summary svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  transition: transform var(--motion-fast) ease;
+}
+
+.analysis-details[open] summary svg {
+  transform: rotate(90deg);
+}
+
+.analysis-details dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-4);
+  margin: var(--space-2) 0 0;
+}
+
+.analysis-details dt {
+  color: var(--text-muted);
+}
+
+.analysis-details dd {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+/* Conflict options: one compact row each (who · what changed · Keep) */
+.choice-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.choice-row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.choice-row:first-child {
+  border-top: 0;
+}
+
+.choice-row-who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.change-words {
+  font-family: var(--font-doc);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+}
+
+.change-words del {
+  color: var(--text-muted);
+}
+
+.change-words ins {
+  text-decoration: none;
+  font-weight: var(--weight-bold);
+}
+
+.change-words mark {
+  background: var(--conflict-tint-strong);
+  color: inherit;
+}
+
+.conflict-popover-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.button.quiet-link {
+  color: var(--text-secondary);
+}
+
+.grammar-popover {
+  width: 300px;
+}
+
+.grammar-card {
+  gap: var(--space-2);
+}
+
+/* ---------- Review panel ---------- */
+/* Slides by animating its width; the inner column keeps a fixed width so nothing reflows. */
+.review-panel {
+  width: var(--review-w);
+  flex-shrink: 0;
+  overflow: hidden;
+  border-left: 1px solid var(--border-subtle);
+  background: var(--surface-base);
+  transition:
+    width var(--motion-panel) var(--ease-standard),
+    border-color var(--motion-panel) var(--ease-standard);
+}
+
+.review-panel[data-open="false"] {
+  width: 0;
+  border-left-color: transparent;
+}
+
+.review-panel-inner {
+  display: flex;
+  flex-direction: column;
+  width: var(--review-w);
+  height: 100%;
+}
+
+.review-panel-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-h-lg);
+  padding: 0 var(--space-2) 0 var(--space-4);
+}
+
+.review-panel-title {
+  flex: 1;
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+}
+
+.review-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 var(--space-2) var(--space-2);
+}
+
+.review-section-label {
+  padding: var(--space-3) var(--space-2) var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+}
+
+.review-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  transition: background-color var(--motion-fast) ease;
+}
+
+.review-item:hover {
+  background: var(--surface-hover);
+}
+
+.review-item[aria-current="true"] {
+  background: var(--surface-selected);
+}
+
+.review-item-type {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+}
+
+.review-item-type time {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-weight: var(--weight-regular);
+}
+
+.review-item-excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.review-item-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.review-item[data-state="resolved"] .review-item-excerpt,
+.review-item[data-state="dismissed"] .review-item-excerpt {
+  color: var(--text-secondary);
+}
+
+.review-item[data-state="stale"] .review-item-excerpt {
+  color: var(--text-muted);
+}
+
+.review-item[data-expanded] {
+  padding: var(--space-3);
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+}
+
+.review-item-icon {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.review-item-icon[data-tone="success"] {
+  color: var(--success);
+}
+
+.review-empty {
+  padding: 0 var(--space-2) var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.review-status {
+  margin: var(--space-2) var(--space-2) 0;
+}
+
+h3.review-section-label {
+  margin: 0;
+}
+
+/* Review toggle in the app bar, with an open-item count */
+.review-toggle {
+  position: relative;
+  display: inline-flex;
+}
+
+.count-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: var(--space-4);
+  height: var(--space-4);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--conflict);
+  color: var(--surface-base); /* white on coral in light, navy on coral in dark */
+  font-size: 10px; /* badge numeral only */
+  font-weight: var(--weight-medium);
+  line-height: var(--space-4);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Phones: the panel is a sheet that slides in from the right over the page */
+@media (max-width: 900px) {
+  .editor-workspace .review-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-popover);
+    width: var(--review-w);
+    max-width: 100%;
+    box-shadow: var(--shadow-dialog);
+    transition: transform var(--motion-panel) var(--ease-standard), box-shadow var(--motion-panel) ease;
+  }
+
+  .editor-workspace .review-panel[data-open="false"] {
+    width: var(--review-w);
+    transform: translateX(100%);
+    box-shadow: none;
+  }
+
+  .review-panel-inner {
+    width: 100%;
+  }
+}
+
+.review-item-note {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.review-item-note .button[data-variant="link"] {
+  font-size: var(--text-xs);
+}
+
+/* ---------- Demo controls (DEMO_MODE only) ---------- */
+.demo-controls {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: var(--z-sticky);
+}
+
+/* Severity: High / Medium / Low beside an issue's title */
+.severity {
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
+
+/* Why an option can't be kept, under the option itself */
+.choice-row-reason {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
