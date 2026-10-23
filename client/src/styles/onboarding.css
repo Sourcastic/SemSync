@@ -1,0 +1,111 @@
+/* First-run onboarding: three short steps on the plain page surface. */
+
+.onboarding {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--space-10) var(--space-4);
+  background: var(--surface-base);
+}
+
+.onboarding-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 520px;
+}
+
+.onboarding-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.onboarding-progress .brand {
+  margin-right: auto;
+}
+
+.onboarding-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.onboarding-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+}
+
+.onboarding-title:focus {
+  outline: none; /* focused programmatically on step change for screen readers */
+}
+
+.onboarding-body {
+  margin-top: var(--space-4);
+}
+
+.onboarding-lead {
+  color: var(--text-secondary);
+}
+
+/* How SemSync works */
+.how-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: how;
+}
+
+.how-list li {
+  display: grid;
+  grid-template-columns: var(--space-6) minmax(0, 1fr);
+  counter-increment: how;
+}
+
+.how-list li::before {
+  content: counter(how);
+  color: var(--text-muted);
+  font-weight: var(--weight-medium);
+}
+
+.how-list strong {
+  display: block;
+  font-weight: var(--weight-medium);
+}
+
+.how-list p {
+  color: var(--text-secondary);
+}
+
+.onboarding-example {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  font-family: var(--font-doc);
+}
+
+.onboarding-ready .button-row {
+  display: grid;
+}
+
+.onboarding-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.onboarding-footer .button[data-variant="primary"] {
+  margin-left: auto;
+}

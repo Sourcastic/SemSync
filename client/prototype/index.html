@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SemSync — Dual View Prototype (Textarea vs ProseMirror)</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        max-width: 760px;
+        margin: 40px auto;
+        padding: 0 16px;
+        color: #212529;
+        line-height: 1.5;
+      }
+      h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 16px 0;
+      }
+      .view-switcher {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 8px;
+      }
+      .tab-btn {
+        padding: 6px 14px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        background: transparent;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-family: inherit;
+        font-weight: 500;
+        color: #495057;
+      }
+      .tab-btn:hover {
+        background: #f1f3f5;
+      }
+      .tab-btn.active {
+        background: #e9ecef;
+        color: #212529;
+        font-weight: 600;
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        gap: 12px;
+      }
+      #status {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        border: 1px solid #ced4da;
+        background: #f8f9fa;
+        color: #495057;
+      }
+      #status.connected {
+        background: #e6f4ea;
+        border-color: #b7e1cd;
+        color: #137333;
+      }
+      #status.disconnected {
+        background: #fce8e6;
+        border-color: #fad2cf;
+        color: #c5221f;
+      }
+      #status.paused {
+        background: #fef7e0;
+        border-color: #feefc3;
+        color: #b06000;
+      }
+      .btn {
+        padding: 5px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+        background: #ffffff;
+        font-size: 0.8rem;
+        font-family: inherit;
+        color: #212529;
+      }
+      .btn:hover {
+        background: #f1f3f5;
+      }
+      .btn-active {
+        background: #1a73e8;
+        border-color: #1a73e8;
+        color: #ffffff;
+      }
+      .btn-active:hover {
+        background: #1765cc;
+      }
+      .presets {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 0.8rem;
+        color: #6c757d;
+      }
+      .preset-btn {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border: 1px solid #dee2e6;
+        background: #ffffff;
+        border-radius: 3px;
+        cursor: pointer;
+        font-family: inherit;
+        color: #495057;
+      }
+      .preset-btn:hover {
+        background: #f8f9fa;
+        border-color: #ced4da;
+      }
+      textarea {
+        width: 100%;
+        height: 240px;
+        font-size: 0.95rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        padding: 12px;
+        box-sizing: border-box;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        outline: none;
+        resize: vertical;
+      }
+      textarea:focus {
+        border-color: #80bdff;
+      }
+      /* ProseMirror View Styles */
+      .pm-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #f8f9fa;
+        padding: 6px 8px;
+        border: 1px solid #ced4da;
+        border-bottom: none;
+        border-radius: 4px 4px 0 0;
+      }
+      .pm-tool-btn {
+        padding: 3px 8px;
+        cursor: pointer;
+        border: 1px solid #dee2e6;
+        background: #ffffff;
+        border-radius: 3px;
+        font-size: 0.8rem;
+        font-family: inherit;
+      }
+      .pm-tool-btn:hover {
+        background: #e9ecef;
+      }
+      .toolbar-separator {
+        width: 1px;
+        height: 16px;
+        background: #dee2e6;
+        margin: 0 4px;
+      }
+      .highlight-btn {
+        background: #fff3cd;
+        border-color: #ffeeba;
+        color: #856404;
+      }
+      .highlight-btn:hover {
+        background: #ffeaa7;
+      }
+      .ProseMirror {
+        min-height: 200px;
+        border: 1px solid #ced4da;
+        border-radius: 0 0 4px 4px;
+        padding: 12px;
+        outline: none;
+        font-family: inherit;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        background: #ffffff;
+      }
+      .ProseMirror:focus {
+        border-color: #80bdff;
+      }
+      .ProseMirror p {
+        margin: 0 0 0.75em 0;
+      }
+      .conflict-highlight {
+        background-color: #ffeaa7;
+        border-bottom: 2px solid #e17055;
+        padding: 2px 2px;
+        border-radius: 2px;
+      }
+      .conflict-pill {
+        display: inline-flex;
+        align-items: center;
+        background: #c5221f;
+        color: #ffffff;
+        font-size: 0.65rem;
+        font-weight: 600;
+        padding: 1px 6px;
+        border-radius: 3px;
+        margin-left: 4px;
+        margin-right: 4px;
+        cursor: pointer;
+        vertical-align: middle;
+      }
+      .pm-hint {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 6px;
+      }
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 14px;
+        gap: 12px;
+        background: #f8f9fa;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid #e9ecef;
+      }
+      #docId {
+        font-size: 0.75rem;
+        color: #6c757d;
+        font-family: monospace;
+        margin: 0;
+        word-break: break-all;
+      }
+      p.instructions {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 0 0 12px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SemSync — Collaborative Editor</h1>
+
+    <div class="view-switcher">
+      <button id="viewTextareaBtn" class="tab-btn active">Textarea View (Layer 1 Raw)</button>
+      <button id="viewProseMirrorBtn" class="tab-btn">ProseMirror View (Layer 1 + Decorations)</button>
+    </div>
+
+    <div class="toolbar">
+      <div id="status">Connecting...</div>
+      <button id="offlineBtn" class="btn">Pause Sync</button>
+    </div>
+
+    <div class="presets">
+      <span>Load Scenario:</span>
+      <button id="presetDemand" class="preset-btn">Market Demand</button>
+      <button id="presetFox" class="preset-btn">The Brown Fox</button>
+    </div>
+
+    <p class="instructions">
+      Open in two tabs to test sync. Use "Pause Sync" on one tab to simulate offline edits, modify both tabs, and click "Resume Sync" to test concurrent merging.
+    </p>
+
+    <!-- View 1: Textarea -->
+    <div id="textareaPanel">
+      <textarea id="editor" placeholder="Start typing..."></textarea>
+    </div>
+
+    <!-- View 2: ProseMirror -->
+    <div id="prosemirrorPanel" style="display: none;">
+      <div class="pm-toolbar">
+        <button id="pmBoldBtn" class="pm-tool-btn" title="Bold (Ctrl+B)"><strong>B</strong></button>
+        <button id="pmItalicBtn" class="pm-tool-btn" title="Italic (Ctrl+I)"><em>I</em></button>
+        <span class="toolbar-separator"></span>
+        <button id="pmDemoConflictBtn" class="pm-tool-btn highlight-btn">Simulate Conflict Highlight</button>
+        <button id="pmClearConflictBtn" class="pm-tool-btn">Clear Highlight</button>
+      </div>
+      <div id="prosemirrorMount"></div>
+      <p class="pm-hint">
+        ProseMirror renders structured text and supports non-destructive visual decorations. Click "Simulate Conflict Highlight" to see how Layer 4 flags contradictions without modifying CRDT document data.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p id="docId"></p>
+      <button id="copyBtn" class="btn">Copy Document Link</button>
+    </div>
+
+    <script type="module" src="/client.js"></script>
+  </body>
+</html>

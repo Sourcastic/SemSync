@@ -1,0 +1,75 @@
+/* Sign in / sign up / reset. No card: the page surface is the background. */
+
+.auth {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--space-10) var(--space-4);
+  background: var(--surface-base);
+}
+
+.auth-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.auth-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+}
+
+.auth-subtitle {
+  color: var(--text-secondary);
+}
+
+.auth-providers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Sits directly under the password field, left aligned */
+.auth-forgot {
+  align-self: flex-start;
+  margin-top: calc(-1 * var(--space-2));
+  font-size: var(--text-sm);
+}
+
+.auth-form .button[type="submit"] {
+  margin-top: var(--space-2);
+}
+
+.auth-demo-note {
+  margin-top: calc(-1 * var(--space-2));
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.auth-footer {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.auth-footer .button[data-variant="link"] {
+  font-size: inherit;
+}

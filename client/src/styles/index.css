@@ -1,0 +1,9 @@
+/* Single entry for app styles. Order: tokens → base → primitives → domains. */
+@import "./tokens.css";
+@import "./base.css";
+@import "./ui.css";
+@import "./workspace.css";
+@import "./editor.css";
+@import "./semantic.css";
+@import "./auth.css";
+@import "./onboarding.css";

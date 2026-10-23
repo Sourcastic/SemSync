@@ -1,16 +1,11 @@
-// client.js — SemSync Layer 1: CRDT Replication (browser peer)
-//
-// Maps onto the diagram like this:
-//   - Yjs/Automerge engine        -> Repo + DocHandle below
-//   - Vector clock management     -> built into Automerge; every change
-//                                    already knows its causal parents, so
-//                                    there's nothing extra to write
-//   - WebRTC/WebSocket broadcast  -> BrowserWebSocketClientAdapter below
+// client.js — SemSync: Collaborative Editor (Dual View: Textarea + ProseMirror)
 
 import { Repo } from "@automerge/automerge-repo"
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket"
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb"
 import { updateText } from "@automerge/automerge/next"
+import { toggleMark } from "prosemirror-commands"
+import { setupProseMirror } from "./src/editor/proseMirrorView.js"
 
 const SYNC_SERVER_URL = "ws://localhost:3030"
 
@@ -108,25 +103,18 @@ if (!hashDocUrl) {
 await handle.whenReady()
 docIdEl.textContent = `Document: ${handle.url}`
 
-// --- local edits: textarea -> CRDT ---------------------------------
+// --- 1. Textarea View Setup -----------------------------------------
 let applyingRemoteChange = false
 
 editor.addEventListener("input", () => {
   if (applyingRemoteChange) return
   handle.change(doc => {
-    // updateText() diffs the old CRDT text against the new plain string
-    // and applies the minimal set of character-level insertions/deletions
-    // as a proper CRDT splice, instead of replacing the whole field
-    // (which would just be last-write-wins).
     updateText(doc, ["text"], editor.value)
   })
 })
 
-// --- remote edits: CRDT -> textarea ---------------------------------
 handle.on("change", ({ doc }) => {
   if (!doc) return
-  // If this tab already has the matching text (e.g. the local user just typed it),
-  // skip re-rendering to avoid clobbering the caret position.
   if (editor.value === doc.text) return
 
   applyingRemoteChange = true
@@ -138,11 +126,71 @@ handle.on("change", ({ doc }) => {
   applyingRemoteChange = false
 })
 
-// Set initial textarea contents once the doc has loaded.
 const initialDoc = await handle.doc()
 editor.value = initialDoc.text ?? ""
 
-// Copy link button helper
+// --- 2. ProseMirror View Setup --------------------------------------
+const pmMount = document.getElementById("prosemirrorMount")
+const pm = setupProseMirror(handle, pmMount)
+
+// Formatting buttons
+document.getElementById("pmBoldBtn")?.addEventListener("click", () => {
+  const { state, dispatch } = pm.view
+  const markType = state.schema.marks.strong || state.schema.marks.bold
+  if (markType) {
+    toggleMark(markType)(state, dispatch)
+    pm.view.focus()
+  }
+})
+
+document.getElementById("pmItalicBtn")?.addEventListener("click", () => {
+  const { state, dispatch } = pm.view
+  const markType = state.schema.marks.em || state.schema.marks.italic
+  if (markType) {
+    toggleMark(markType)(state, dispatch)
+    pm.view.focus()
+  }
+})
+
+// Layer 4 Demo: Simulate Conflict Highlight
+document.getElementById("pmDemoConflictBtn")?.addEventListener("click", () => {
+  const currentText = handle.docSync()?.text || ""
+  // Highlight around 'skyrocketing' or 'fox' or first words
+  const idx = currentText.toLowerCase().indexOf("skyrocketing")
+  if (idx !== -1) {
+    pm.highlightConflictSpan(idx + 1, idx + 1 + "skyrocketing and plummeting".length, "Contradiction (0.94)")
+  } else {
+    pm.highlightConflictSpan(1, Math.min(25, currentText.length + 1), "Sample Contradiction")
+  }
+})
+
+document.getElementById("pmClearConflictBtn")?.addEventListener("click", () => {
+  pm.clearConflictHighlights()
+})
+
+// --- 3. View Switcher Tabs ------------------------------------------
+const viewTextareaBtn = document.getElementById("viewTextareaBtn")
+const viewProseMirrorBtn = document.getElementById("viewProseMirrorBtn")
+const textareaPanel = document.getElementById("textareaPanel")
+const prosemirrorPanel = document.getElementById("prosemirrorPanel")
+
+viewTextareaBtn?.addEventListener("click", () => {
+  viewTextareaBtn.classList.add("active")
+  viewProseMirrorBtn.classList.remove("active")
+  textareaPanel.style.display = "block"
+  prosemirrorPanel.style.display = "none"
+  editor.value = handle.docSync()?.text ?? ""
+})
+
+viewProseMirrorBtn?.addEventListener("click", () => {
+  viewProseMirrorBtn.classList.add("active")
+  viewTextareaBtn.classList.remove("active")
+  textareaPanel.style.display = "none"
+  prosemirrorPanel.style.display = "block"
+  pm.view.focus()
+})
+
+// --- 4. Preset Examples and Utilities --------------------------------
 const copyBtn = document.getElementById("copyBtn")
 if (copyBtn) {
   copyBtn.addEventListener("click", async () => {
@@ -156,7 +204,6 @@ if (copyBtn) {
   })
 }
 
-// Preset examples from proposal
 document.getElementById("presetDemand")?.addEventListener("click", () => {
   const sentence = "The current financial indicators show that market demand is stable and level."
   editor.value = sentence
@@ -168,5 +215,3 @@ document.getElementById("presetFox")?.addEventListener("click", () => {
   editor.value = sentence
   handle.change(doc => updateText(doc, ["text"], sentence))
 })
-
-

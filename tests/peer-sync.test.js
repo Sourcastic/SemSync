@@ -17,9 +17,9 @@
 
 import { Repo } from "@automerge/automerge-repo"
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket"
-import { updateText } from "@automerge/automerge/next"
+import { updateText } from "@automerge/automerge"
 
-const URL = "ws://localhost:3030"
+const URL = process.env.SYNC_URL ?? "ws://localhost:3030"
 
 function makeRepo(peerId) {
   return new Repo({
@@ -41,7 +41,7 @@ console.log("A ready, url:", handleA.url)
 // Give the server a moment to register peer A and share the doc.
 await new Promise(r => setTimeout(r, 500))
 
-const handleB = repoB.find(handleA.url)
+const handleB = await repoB.find(handleA.url)
 console.log("B requested doc, waiting for ready...")
 await handleB.whenReady()
 console.log("B ready")
@@ -49,14 +49,14 @@ console.log("B ready")
 // Wait until B actually has A's initial content (not just an empty doc).
 await new Promise(resolve => {
   const check = () => {
-    const d = handleB.docSync()
+    const d = handleB.doc()
     if (d && d.text === "The brown fox.") resolve()
   }
   handleB.on("change", check)
   check()
 })
 
-console.log("Initial sync OK. B sees:", JSON.stringify(handleB.docSync().text))
+console.log("Initial sync OK. B sees:", JSON.stringify(handleB.doc().text))
 
 // Concurrent edits — A inserts "quick", B deletes "brown fox".
 handleA.change(doc => updateText(doc, ["text"], "The quick brown fox."))
@@ -64,8 +64,8 @@ handleB.change(doc => updateText(doc, ["text"], "The ."))
 
 await new Promise(r => setTimeout(r, 1000))
 
-const finalA = handleA.docSync().text
-const finalB = handleB.docSync().text
+const finalA = handleA.doc().text
+const finalB = handleB.doc().text
 
 console.log("A converged to:", JSON.stringify(finalA))
 console.log("B converged to:", JSON.stringify(finalB))
