@@ -16,7 +16,7 @@ Every new browser tab starts at sign-in: any email and password work, or use **C
 Add `?as=atika` or `?as=ibrahim` before the `#` to join a document as another collaborator, e.g.
 `http://localhost:5173/?as=atika#/doc/market-demand`. The two demo documents (Market Demand Analysis, The Quick Brown Fox) each have a grammar mistake and a scenario sentence. In the editor, **Demo → Both online** or **You offline, then reconnect** runs a real concurrent edit and its analysis; **Reset document** starts over. See [DEMO-GUIDE.md](DEMO-GUIDE.md) for the presentation script.
 
-Optional environment variables (client): `VITE_SYNC_SERVER_URL`, `VITE_NLP_URL` (an NLI service exposing `POST /analyze`).
+Optional environment variables (client): `VITE_SYNC_SERVER_URL`, `VITE_NLP_URL` (an NLI service exposing `POST /analyze`; see `client/.env.example` and `nlp/`). Concurrent edits are detected from the Automerge change history in `components/semantic/concurrency.js`; run `node tests/concurrency.test.js` after changing it.
 
 ## Who owns what
 

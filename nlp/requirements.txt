@@ -2,5 +2,9 @@ fastapi>=0.110.0
 uvicorn>=0.28.0
 pydantic>=2.6.0
 transformers>=4.38.0
+sentencepiece>=0.2.0
+protobuf>=4.25.0
+# CPU-only PyTorch is enough (no GPU needed). Install it first with:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
 torch>=2.2.0
-spacy>=3.7.0
+scikit-learn>=1.4.0

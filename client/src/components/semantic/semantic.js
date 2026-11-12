@@ -1,21 +1,30 @@
 // Connects the semantic plugin to analysis and exposes its state to React.
 // Analysis failures change `analysis` status only; editing is never blocked.
 import { TextSelection } from "prosemirror-state"
+import * as A from "@automerge/automerge"
 import { semanticKey, semanticState, dispatchSemantic } from "./semanticPlugin.js"
 import { findGrammarIssues } from "./grammarCheck.js"
 import { analyzeConcurrentEdits } from "./analysis.js"
+import { detectForks, extractConflicts, locateSentence } from "./concurrency.js"
 import { connectSharedResolutions, sharedKey } from "./sharedResolutions.js"
 
 const GRAMMAR_DEBOUNCE_MS = 600
+const CONCURRENCY_DEBOUNCE_MS = 700
+
+const conflictKey = (original, versions) =>
+  `conflict:${original}::${versions.map(v => `${v.authorId}:${v.text}`).sort().join("::")}`
 
 // shared: { handle, me, notify } to sync resolutions with other people; optional.
 export function connectSemantic(editor, shared) {
   const { view } = editor
   const listeners = new Set()
   const dismissedKeys = new Set()
+  const analyzedKeys = new Set()
+  const pendingKeys = new Set()
   let analysis = "idle" // "idle" | "analyzing" | "unavailable"
   let snapshot = { ...semanticState(view.state), analysis }
   let timer = null
+  let concurrencyTimer = null
   let lastDoc = null
 
   function publish() {
@@ -63,15 +72,72 @@ export function connectSemantic(editor, shared) {
     timer = setTimeout(runGrammar, GRAMMAR_DEBOUNCE_MS)
   }
 
+  async function runConcurrency() {
+    concurrencyTimer = null
+    if (view.isDestroyed || !shared?.handle) return
+    const doc = shared.handle.doc()
+    if (!doc) return
+
+    const forks = detectForks(doc)
+    if (!forks.length) return
+
+    const localActor = A.getActorId(doc)
+    const existingConflicts = semanticState(view.state).issues.filter(i => i.kind === "conflict")
+
+    for (const fork of forks) {
+      const candidates = extractConflicts(fork)
+      for (const candidate of candidates) {
+        const { original, merged, versions } = candidate
+        const mappedVersions = versions.map(v => ({
+          ...v,
+          authorId: v.authorId === localActor ? (shared.me?.id ?? v.authorId) : v.authorId,
+        }))
+
+        const key = conflictKey(original, mappedVersions)
+        if (dismissedKeys.has(key)) continue
+        if (pendingKeys.has(key) || analyzedKeys.has(key)) continue
+        if (existingConflicts.some(i => i.key === key || (i.conflict?.original === original && i.status === "open"))) continue
+
+        pendingKeys.add(key)
+        try {
+          await actions.analyzeConflict({
+            versions: mappedVersions,
+            original,
+            merged,
+            key,
+            locate: d => locateSentence(d, { original, merged, versions: mappedVersions }),
+          })
+          analyzedKeys.add(key)
+        } catch {
+          // Handled inside analyzeConflict
+        } finally {
+          pendingKeys.delete(key)
+        }
+      }
+    }
+  }
+
+  function scheduleConcurrency() {
+    clearTimeout(concurrencyTimer)
+    concurrencyTimer = setTimeout(runConcurrency, CONCURRENCY_DEBOUNCE_MS)
+  }
+
+  const onHandleChange = () => {
+    scheduleConcurrency()
+  }
+  shared?.handle?.on("change", onHandleChange)
+
   const unsubscribe = editor.subscribe(() => {
     if (view.state.doc !== lastDoc) {
       lastDoc = view.state.doc
       scheduleGrammar()
+      scheduleConcurrency()
     }
     publish()
   })
   lastDoc = view.state.doc
   runGrammar()
+  scheduleConcurrency()
 
   // Clear grammar errors inside a freshly merged sentence are fixed in the same step,
   // as one undoable transaction, and recorded under Resolved so the fix stays visible.
@@ -158,22 +224,27 @@ export function connectSemantic(editor, shared) {
     // Forget every result (open, resolved, dismissed); grammar is re-checked straight away.
     clearIssues() {
       dismissedKeys.clear()
+      analyzedKeys.clear()
+      pendingKeys.clear()
       dispatchSemantic(view, { remove: semanticState(view.state).issues.map(issue => issue.id) })
       analysis = "idle"
       runGrammar()
     },
     // Layer 2 → 3: concurrent versions of a passage are classified; a contradiction is flagged.
     // locate(doc) returns the merged passage's { from, to } at the moment the result arrives.
-    async analyzeConflict({ versions, original, locate }, options) {
+    async analyzeConflict({ versions, original, merged, key, locate }, options) {
+      const cKey = key ?? conflictKey(original, versions)
+      analyzedKeys.add(cKey)
       analysis = "analyzing"
       publish()
       try {
         const result = await analyzeConcurrentEdits(versions, { ...options, original })
         analysis = "idle"
-        if (!view.isDestroyed) autoFixGrammar(locate(view.state.doc))
-        const range = view.isDestroyed ? null : locate(view.state.doc)
+        const findRange = locate ?? (d => locateSentence(d, { original, merged, versions }))
+        if (!view.isDestroyed) autoFixGrammar(findRange(view.state.doc))
+        const range = view.isDestroyed ? null : findRange(view.state.doc)
         if (range && (result.classification === "contradiction" || result.classification === "incoherent")) {
-          const merged = view.state.doc.textBetween(range.from, range.to)
+          const text = view.state.doc.textBetween(range.from, range.to)
           dispatchSemantic(view, {
             add: [{
               id: `conflict-${crypto.randomUUID().slice(0, 8)}`,
@@ -181,9 +252,10 @@ export function connectSemantic(editor, shared) {
               status: "open",
               from: range.from,
               to: range.to,
-              text: merged,
+              text,
+              key: cKey,
               createdAt: Date.now(),
-              conflict: { original, versions, merged, ...result },
+              conflict: { original, versions, merged: text, ...result },
             }],
           })
         }
@@ -206,6 +278,8 @@ export function connectSemantic(editor, shared) {
     actions,
     destroy() {
       clearTimeout(timer)
+      clearTimeout(concurrencyTimer)
+      shared?.handle?.off("change", onHandleChange)
       resolutions?.destroy()
       unsubscribe()
       listeners.clear()

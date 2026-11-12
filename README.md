@@ -72,6 +72,9 @@ SemSync/
 │   ├── prototype/              # Original dual-view prototype (reference only)
 │   ├── src/
 │   │   ├── components/         # ui/, editor/, semantic/, collaboration/, documents/
+│   │   │                       #   semantic/concurrency.js = Layer 2 (fork detection, conflict packaging)
+│   │   │                       #   semantic/analysis.js    = Layer 3 client (NLI service, local fallback)
+│   │   │                       #   semantic/grammarCheck.js = rule-based grammar checks (client-side)
 │   │   ├── features/           # Screens: auth, onboarding, workspace, editor
 │   │   ├── demo/               # Evaluator demo scenarios (DEMO_MODE)
 │   │   ├── lib/                # Repo, document index, router, session, theme
@@ -80,18 +83,14 @@ SemSync/
 │   ├── package.json
 │   └── vite.config.js
 │
-├── server/                     # CRDT relay & synchronization backend
-│   ├── src/
-│   │   ├── crdt/               # Automerge Repo & persistence adapters
-│   │   ├── concurrency/        # Fork detection & span extraction
-│   │   └── analysis/           # NLI bridge & result dispatcher
+├── server/                     # CRDT relay & persistence backend (Layer 1)
+│   ├── server.js               # Automerge Repo + WebSocket adapter + disk storage
 │   └── package.json
 │
-├── nlp/                        # Layer 3 NLP/NLI microservice
-│   ├── main.py                 # FastAPI service entry
-│   ├── nli.py                  # Contradiction classification pipeline
-│   ├── grammar.py              # Grammar & dangling modifier checks
-│   ├── schemas.py              # Pydantic request/response models
+├── nlp/                        # Layer 3 NLI microservice (Python / FastAPI)
+│   ├── main.py                 # POST /analyze { premise, hypothesis } -> { label, score, model }
+│   ├── nli.py                  # Pretrained NLI model, scored in both directions
+│   ├── smoke_test.py           # Checks the model loads and labels make sense
 │   └── requirements.txt
 │
 ├── shared/
@@ -100,13 +99,17 @@ SemSync/
 │
 ├── tests/
 │   ├── peer-sync.test.js       # Headless Layer 1 convergence verification
-│   ├── concurrency.test.js
-│   ├── contradiction.test.js
-│   └── grammar-conflict.test.js
+│   └── concurrency.test.js     # Headless Layer 2 fork detection and conflict packaging
 │
 ├── package.json                # Root npm workspace
 └── README.md
 ```
+
+Notes on where things run:
+
+- **Layer 2** reads the Automerge change history of the document replica each peer holds (`A.getHeads`, `A.getAllChanges`, `A.view`). It lives in the client because that is where the live document and the editor are. The sync server only relays and stores.
+- **Layer 3** is the Python service. The client calls it directly; if it is not configured or not running, the app falls back to a small local keyword heuristic and says so on the result.
+- **Grammar** is rule-based and runs in the client (`grammarCheck.js`).
 
 Before changing the client, read [docs/CHANGE-GUIDE.md](docs/CHANGE-GUIDE.md).
 
@@ -140,12 +143,27 @@ npm run dev
 
 Open `http://localhost:5173/` in two browser tabs or windows side-by-side to test live CRDT synchronization.
 
-### Run Headless Verification Test
+### Run the NLI Service (Layer 3, optional but recommended)
 
-Reproduces the proposal's dangling-modifier scenario over WebSockets headlessly:
+Requires Python 3.10 to 3.12. The first run downloads the model (a few hundred MB).
 
 ```bash
-node tests/peer-sync.test.js
+cd nlp
+python -m venv .venv
+.venv\Scripts\activate            # macOS/Linux: source .venv/bin/activate
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements.txt
+python smoke_test.py               # checks the model and label order
+uvicorn main:app --port 8000       # try it at http://localhost:8000/docs
+```
+
+Then copy `client/.env.example` to `client/.env.local` and restart `npm run dev`. In the app, the result details show which model produced the verdict.
+
+### Run Headless Verification Tests
+
+```bash
+node tests/peer-sync.test.js       # Layer 1: convergence over WebSockets (start the server first)
+node tests/concurrency.test.js     # Layer 2: fork detection and conflict packaging
 ```
 
 ---

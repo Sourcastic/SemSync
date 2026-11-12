@@ -4,6 +4,7 @@ import * as A from "@automerge/automerge"
 import { COLLABORATORS } from "../lib/collaborators.js"
 import { setNetworkPaused } from "../lib/repo.js"
 import { contextOf, resolutionField } from "../components/semantic/sharedResolutions.js"
+import { detectFork, extractConflicts } from "../components/semantic/concurrency.js"
 
 // One scenario per demo document: the two problem examples from the project slides.
 // `anchor` is a phrase neither edit touches, used to find the sentence after merging;
@@ -46,11 +47,6 @@ const GRAMMAR_SENTENCE = " The numbers shows the same pattern in every region."
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 const peerId = authorId => `demo-${authorId}`
-
-function applyEdit(sentence, { at, remove, insert }) {
-  const index = sentence.indexOf(at)
-  return sentence.slice(0, index) + insert + sentence.slice(index + remove.length)
-}
 
 function findText(doc, needle) {
   let found = null
@@ -113,17 +109,28 @@ function restoreOriginal({ editor }, scenario) {
 }
 
 // A collaborator's edit made on their own copy, starting from the same heads as everyone else.
-function forkWithEdit(handle, scenario, edit) {
-  return A.change(A.clone(handle.doc()), doc => {
+// The change message records who made it, which Layer 2 reads back from the change history.
+function forkWithEdit(handle, scenario, edit, authorId) {
+  return A.change(A.clone(handle.doc()), { message: authorId }, doc => {
     const index = doc.text.indexOf(scenario.original) + scenario.original.indexOf(edit.at)
     A.splice(doc, ["text"], index, edit.remove.length, edit.insert)
   })
 }
 
+// Layer 2 → 3: the concurrent versions come from the document's change history, not from the script.
+// `authors` is the expected order of the two people; this tab's own edits carry no message, so they
+// are recognised by this tab's actor id.
 function analyse(context, scenario, authors, options) {
-  const versions = scenario.edits.map((edit, i) => ({ authorId: authors[i], text: applyEdit(scenario.original, edit) }))
-  return context.semantic.actions.analyzeConflict(
-    { versions, original: scenario.original, locate: doc => locateSentence(doc, scenario) },
+  const { handle, semantic } = context
+  const fork = detectFork(handle.doc())
+  const conflict = fork && extractConflicts(fork).find(found => found.original === scenario.original)
+  if (!conflict) return null // no concurrent edit to this sentence, so nothing to analyse
+  const localActor = A.getActorId(handle.doc())
+  const versions = conflict.versions
+    .map(version => ({ ...version, authorId: version.authorId === localActor ? authors[0] : version.authorId }))
+    .sort((a, b) => authors.indexOf(a.authorId) - authors.indexOf(b.authorId))
+  return semantic.actions.analyzeConflict(
+    { versions, original: conflict.original, locate: doc => locateSentence(doc, scenario) },
     options
   )
 }
@@ -152,8 +159,8 @@ export async function runOnlineScenario(context, scenario, options) {
   placeCollaborator(context, "ibrahim", start.from, start.to)
   await wait(1200)
 
-  const atika = forkWithEdit(handle, scenario, scenario.edits[0])
-  const ibrahim = forkWithEdit(handle, scenario, scenario.edits[1])
+  const atika = forkWithEdit(handle, scenario, scenario.edits[0], "atika")
+  const ibrahim = forkWithEdit(handle, scenario, scenario.edits[1], "ibrahim")
   handle.update(doc => A.merge(A.merge(doc, atika), ibrahim))
 
   await wait(50) // let the merge reach the editor
@@ -179,7 +186,7 @@ export async function runOfflineScenario(context, scenario, options, localAuthor
   await wait(1000)
 
   // Ibrahim's change starts from the same version, on his own copy.
-  const ibrahim = forkWithEdit(handle, scenario, scenario.edits[1])
+  const ibrahim = forkWithEdit(handle, scenario, scenario.edits[1], "ibrahim")
 
   // Your edit while offline: a normal editor transaction, saved on this device only.
   const edit = scenario.edits[0]

@@ -31,7 +31,10 @@ const IMPOSSIBLE = {
 }
 
 function authorOf(id) {
-  return COLLABORATORS[id] ?? { id, name: id, fullName: id, color: "var(--avatar-neutral)" }
+  const known = COLLABORATORS[id]
+  if (known) return known
+  const short = id && id.length > 16 ? id.slice(0, 8) : (id ?? "Collaborator")
+  return { id, name: short, fullName: id, color: "var(--avatar-neutral)" }
 }
 
 // Highlights what an author changed relative to the original sentence (shared prefix/suffix trimmed).

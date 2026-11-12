@@ -16,14 +16,18 @@ export const TEXT_PATH = ["text"]
 
 // Remote edits arrive through the sync plugin's change listener. We mark the transactions
 // it dispatches as non-history so Undo only ever reverts the local user's own edits.
-function trackRemoteDispatch(handle) {
+function trackRemoteDispatch(handle, author) {
   const state = { remote: false }
   const wrapped = new Map()
+  const authorId = typeof author === "string" ? author : author?.id
   // A plain delegate (the binding only needs doc/change/on/off). Inheriting from the handle
   // would break DocHandle's private fields.
   const proxy = {
     doc: () => handle.doc(),
-    change: fn => handle.change(fn),
+    change: (fn, options) => {
+      const opts = options ?? (authorId ? { message: authorId } : undefined)
+      return handle.change(fn, opts)
+    },
     on(event, callback) {
       const wrapper = payload => {
         state.remote = true
@@ -54,8 +58,8 @@ const placeholderPlugin = new Plugin({
   },
 })
 
-export function createEditor(mount, handle, { onRequestLink } = {}) {
-  const { proxy, isRemote } = trackRemoteDispatch(handle)
+export function createEditor(mount, handle, { onRequestLink, author } = {}) {
+  const { proxy, isRemote } = trackRemoteDispatch(handle, author)
   const listeners = new Set()
 
   const doc = pmDocFromSpans(schemaAdapter, A.spans(handle.doc(), TEXT_PATH))

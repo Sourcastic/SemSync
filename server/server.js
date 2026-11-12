@@ -44,10 +44,10 @@ const repo = new Repo({
   sharePolicy: async () => true,
 })
 
-// This is exactly the hook Layer 2 (Concurrent Edit Detection) will
-// attach to later: every time the CRDT state changes, we get an event
-// with the change and who made it. For now we just log it so you can see
-// replication happening in real time.
+// Every time the CRDT state changes, we get an event. The server only
+// logs it so you can see replication happening in real time. Layer 2
+// (concurrent edit detection) reads the change history on each peer's
+// own replica: see client/src/components/semantic/concurrency.js.
 repo.on("document", ({ handle }) => {
   handle.on("change", ({ doc, patches, patchInfo }) => {
     console.log(

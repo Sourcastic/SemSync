@@ -1,9 +1,9 @@
 // Meaning-conflict analysis (Layer 3). Asks the NLI service when one is configured
-// (VITE_NLP_URL, POST /analyze { premise, hypothesis } → { label, score }), otherwise
+// (VITE_NLP_URL, POST /analyze { premise, hypothesis } → { label, score, model }), otherwise
 // falls back to a small local heuristic so the demo works offline. The result always says
 // which one produced it, so the evaluator can tell.
 
-const NLP_URL = import.meta.env.VITE_NLP_URL
+const NLP_URL = import.meta.env?.VITE_NLP_URL // optional chaining: Node scripts have no import.meta.env
 const TIMEOUT_MS = 8000
 
 // Opposing direction words. Deliberately tiny: the real classifier is the NLI service.
@@ -37,7 +37,7 @@ function danglingAddition(original, [first, second]) {
 
 const stems = text => new Set(text.toLowerCase().match(/[a-z]+/g)?.map(word => word.replace(/(ing|es|s|d|ed)$/, "")) ?? [])
 
-function localClassify(premise, hypothesis, original) {
+export function localClassify(premise, hypothesis, original) {
   if (original && danglingAddition(original, [premise, hypothesis])) return { classification: "incoherent", confidence: 0.78 }
   const a = stems(premise)
   const b = stems(hypothesis)
@@ -58,8 +58,8 @@ async function serviceClassify(premise, hypothesis) {
       signal: controller.signal,
     })
     if (!response.ok) throw new Error(`NLI service responded ${response.status}`)
-    const { label, score } = await response.json()
-    return { classification: String(label).toLowerCase(), confidence: Number(score) }
+    const { label, score, model } = await response.json()
+    return { classification: String(label).toLowerCase(), confidence: Number(score), model: model ? `NLI service (${model})` : "NLI service" }
   } finally {
     clearTimeout(timer)
   }
@@ -70,7 +70,18 @@ async function serviceClassify(premise, hypothesis) {
 export async function analyzeConcurrentEdits(versions, { original, simulateFailure = false } = {}) {
   if (simulateFailure) throw new Error("Semantic analysis is unavailable")
   const [premise, hypothesis] = versions.map(version => version.text)
-  if (NLP_URL) return { ...(await serviceClassify(premise, hypothesis)), model: "NLI service (deberta-v3-small, MNLI)" }
+  if (NLP_URL) {
+    // NLI judges meaning; an addition left without the words it described is a structural problem it is not built for.
+    if (original && danglingAddition(original, [premise, hypothesis])) {
+      return { classification: "incoherent", confidence: 0.78, model: "Rule: addition left without its target" }
+    }
+    try {
+      return await serviceClassify(premise, hypothesis)
+    } catch (error) {
+      console.warn("NLI service call failed, falling back to local heuristic:", error.message)
+      return { ...localClassify(premise, hypothesis, original), model: "Local heuristic (NLI service unreachable)" }
+    }
+  }
   // Give the "Analyzing…" state a visible moment, as a real round trip would.
   await new Promise(resolve => setTimeout(resolve, 700))
   return { ...localClassify(premise, hypothesis, original), model: "Local heuristic (NLI service not configured)" }

@@ -206,7 +206,7 @@ export function EditorScreen({ id, shared, session }) {
           <div className="doc-layout">
             <div className="page">
               {loaded.status === "ready" ? (
-                <EditorSurface handle={loaded.handle} onReady={setEditor} onRequestLink={() => setLinkOpen(true)} />
+                <EditorSurface handle={loaded.handle} author={me.id} onReady={setEditor} onRequestLink={() => setLinkOpen(true)} />
               ) : (
                 <div className="page-loading" aria-busy="true" aria-label="Opening document">
                   <span className="skeleton" style={{ width: "50%", height: 24 }} />
