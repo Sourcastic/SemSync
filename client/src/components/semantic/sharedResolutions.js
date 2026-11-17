@@ -67,6 +67,13 @@ export function connectSharedResolutions({ view, handle, me, onSettled }) {
     })
   }
 
+  // Dismissals are stored too, so a dismissed issue stays dismissed after a reload and for everyone.
+  function dismiss(issue) {
+    handle.change(doc => {
+      doc[PREFIX + sharedKey(issue)] = { dismissed: true, label: "Dismissed", by: me.id, byName: me.name, at: Date.now() }
+    })
+  }
+
   function check() {
     const doc = handle.doc()
     if (!doc) return
@@ -85,7 +92,8 @@ export function connectSharedResolutions({ view, handle, me, onSettled }) {
       const winner = pickWinner(records)
       const mine = winner.by === me.id
       if (mine) {
-        const range = locate(view.state.doc, winner)
+        // A dismissal changes no text, so there is nothing to repair; the other edit simply stays.
+        const range = winner.dismissed ? null : locate(view.state.doc, winner)
         if (range && view.state.doc.textBetween(range.from, range.to) !== winner.choice) {
           view.dispatch(view.state.tr.insertText(winner.choice, range.from, range.to).setMeta("addToHistory", false))
         }
@@ -106,6 +114,7 @@ export function connectSharedResolutions({ view, handle, me, onSettled }) {
   handle.on("change", schedule)
   return {
     record,
+    dismiss,
     destroy() {
       clearTimeout(timer)
       handle.off("change", schedule)

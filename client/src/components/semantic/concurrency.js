@@ -56,8 +56,13 @@ export function detectFork(doc) {
   return buildFork(doc, heads, changes, byHash)
 }
 
-// Finds all concurrent forks in the document: open forks (heads.length >= 2) and merged forks in history.
-export function detectForks(doc) {
+// Identifies a fork by its heads; the same in every call, so callers can remember forks already checked.
+export const forkKey = heads => [...heads].sort().join(":")
+
+// Finds all concurrent forks in the document: open forks (heads.length >= 2) and merged forks in history,
+// newest first, so a caller can let the latest conflict on a sentence supersede older ones.
+// skip: optional Set of forkKey values not to rebuild (history never changes an existing fork).
+export function detectForks(doc, skip) {
   if (!doc) return []
   const heads = A.getHeads(doc)
   const changes = A.getAllChanges(doc).map(change => A.decodeChange(change))
@@ -67,7 +72,7 @@ export function detectForks(doc) {
   if (heads.length >= 2) {
     forkHeadSets.push(heads)
   }
-  for (const c of changes) {
+  for (const c of [...changes].reverse()) {
     if (c.deps && c.deps.length >= 2) {
       forkHeadSets.push(c.deps)
     }
@@ -76,8 +81,8 @@ export function detectForks(doc) {
   const seenSets = new Set()
   const uniqueForks = []
   for (const hSet of forkHeadSets) {
-    const key = [...hSet].sort().join(":")
-    if (seenSets.has(key)) continue
+    const key = forkKey(hSet)
+    if (seenSets.has(key) || skip?.has(key)) continue
     seenSets.add(key)
     uniqueForks.push(hSet)
   }

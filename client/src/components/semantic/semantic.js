@@ -5,7 +5,7 @@ import * as A from "@automerge/automerge"
 import { semanticKey, semanticState, dispatchSemantic } from "./semanticPlugin.js"
 import { findGrammarIssues } from "./grammarCheck.js"
 import { analyzeConcurrentEdits } from "./analysis.js"
-import { detectForks, extractConflicts, locateSentence } from "./concurrency.js"
+import { detectForks, extractConflicts, locateSentence, forkKey } from "./concurrency.js"
 import { connectSharedResolutions, sharedKey, resolutionField } from "./sharedResolutions.js"
 
 const GRAMMAR_DEBOUNCE_MS = 600
@@ -19,8 +19,11 @@ export function connectSemantic(editor, shared) {
   const { view } = editor
   const listeners = new Set()
   const dismissedKeys = new Set()
-  const analyzedKeys = new Set()
+  // Dismissed here, or by anyone at any time (stored in the shared document).
+  const isDismissed = key => dismissedKeys.has(key) || Boolean(shared?.handle?.doc()?.[resolutionField({ key })]?.dismissed)
   const pendingKeys = new Set()
+  const checkedForks = new Set() // forks whose candidates were all handled; history never changes them
+  const inFlight = new Set() // sentences being analysed right now, so one sentence is never sent twice
   let analysis = "idle" // "idle" | "analyzing" | "unavailable"
   let snapshot = { ...semanticState(view.state), analysis }
   let timer = null
@@ -39,7 +42,7 @@ export function connectSemantic(editor, shared) {
     timer = null
     if (view.isDestroyed) return
     try {
-      const found = findGrammarIssues(view.state.doc).filter(issue => !dismissedKeys.has(issue.key))
+      const found = findGrammarIssues(view.state.doc).filter(issue => !isDismissed(issue.key))
       const grammarIssues = semanticState(view.state).issues.filter(issue => issue.kind === "grammar")
       const existing = grammarIssues.filter(issue => issue.status === "open")
       // Grammar is cheap to re-check, so stale grammar results are replaced rather than shown as outdated.
@@ -78,30 +81,46 @@ export function connectSemantic(editor, shared) {
     const doc = shared.handle.doc()
     if (!doc) return
 
-    const forks = detectForks(doc)
+    // Someone else dismissed an issue that is open here: close it here too.
+    for (const issue of semanticState(view.state).issues) {
+      const record = issue.status === "open" && issue.key && doc[resolutionField(issue)]
+      if (record?.dismissed && !dismissedKeys.has(issue.key)) {
+        dismissedKeys.add(issue.key)
+        settle(issue, { status: "dismissed", resolution: `Dismissed by ${record.byName ?? "a collaborator"}` })
+      }
+    }
+
+    const forks = detectForks(doc, checkedForks)
     const currentText = doc.text.replace(/￼/g, "\n").replace(/\s+/g, " ")
     if (!forks.length) return
 
     const localActor = A.getActorId(doc)
+    // Forks arrive newest first. Only the latest conflict on a sentence counts: if it was dismissed or
+    // resolved, older conflicts on the same sentence in the history are superseded by that decision.
+    const seenSentences = new Set()
 
     for (const fork of forks) {
       const candidates = extractConflicts(fork)
       for (const candidate of candidates) {
         const { original, merged, versions } = candidate
+        if (seenSentences.has(original)) continue
+        seenSentences.add(original)
         const mappedVersions = versions.map(v => ({
           ...v,
           authorId: v.authorId === localActor ? (shared.me?.id ?? v.authorId) : v.authorId,
-        }))
+        })).sort((a, b) => a.authorId.localeCompare(b.authorId)) // same order on every device
 
         const key = conflictKey(original, mappedVersions)
-        if (dismissedKeys.has(key)) continue
+        if (isDismissed(key)) continue
         // History keeps every past fork, so after a reload old conflicts would come back. Skip those
         // already resolved (a shared record exists) or since edited (the merged text is gone).
         if (doc[resolutionField({ key })] || !merged || !currentText.includes(merged.replace(/\s+/g, " "))) continue
-        if (pendingKeys.has(key) || analyzedKeys.has(key)) continue
+        // Repeats are tracked per fork (checkedForks), not by content: the same edit made again later,
+        // as after a demo reset in another tab, is a new conflict and must be checked again.
+        if (pendingKeys.has(key)) continue
         // Read fresh each time: an earlier candidate in this pass may have just flagged the same sentence.
-        const existingConflicts = semanticState(view.state).issues.filter(i => i.kind === "conflict")
-        if (existingConflicts.some(i => i.key === key || (i.conflict?.original === original && i.status === "open"))) continue
+        const open = semanticState(view.state).issues.filter(i => i.kind === "conflict" && i.status === "open")
+        if (open.some(i => i.key === key || i.conflict?.original === original)) continue
 
         pendingKeys.add(key)
         try {
@@ -112,13 +131,13 @@ export function connectSemantic(editor, shared) {
             key,
             locate: d => locateSentence(d, { original, merged, versions: mappedVersions }),
           })
-          analyzedKeys.add(key)
         } catch {
           // Handled inside analyzeConflict
         } finally {
           pendingKeys.delete(key)
         }
       }
+      checkedForks.add(forkKey(fork.heads))
     }
   }
 
@@ -213,7 +232,10 @@ export function connectSemantic(editor, shared) {
       settle(issue, { status: "resolved", resolution: `Changed to “${issue.grammar.replacement}”` }, tr => tr.insertText(issue.grammar.replacement, issue.from, issue.to))
     },
     dismiss(issue) {
-      if (issue.key) dismissedKeys.add(issue.key)
+      if (issue.key) {
+        dismissedKeys.add(issue.key)
+        resolutions?.dismiss(issue)
+      }
       settle(issue, { status: "dismissed" })
     },
     reanalyze(issue) {
@@ -229,8 +251,8 @@ export function connectSemantic(editor, shared) {
     // Forget every result (open, resolved, dismissed); grammar is re-checked straight away.
     clearIssues() {
       dismissedKeys.clear()
-      analyzedKeys.clear()
       pendingKeys.clear()
+      checkedForks.clear()
       dispatchSemantic(view, { remove: semanticState(view.state).issues.map(issue => issue.id) })
       analysis = "idle"
       runGrammar()
@@ -239,7 +261,9 @@ export function connectSemantic(editor, shared) {
     // locate(doc) returns the merged passage's { from, to } at the moment the result arrives.
     async analyzeConflict({ versions, original, merged, key, locate }, options) {
       const cKey = key ?? conflictKey(original, versions)
-      analyzedKeys.add(cKey)
+      // The demo script and automatic detection can find the same merge at once: ask the model once.
+      if (inFlight.has(original)) return null
+      inFlight.add(original)
       analysis = "analyzing"
       publish()
       try {
@@ -270,6 +294,8 @@ export function connectSemantic(editor, shared) {
         analysis = "unavailable"
         publish()
         return null
+      } finally {
+        inFlight.delete(original)
       }
     },
   }

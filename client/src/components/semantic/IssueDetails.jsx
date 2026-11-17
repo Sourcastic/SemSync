@@ -108,6 +108,9 @@ export function ConflictDetails({ issue, actions }) {
     <div className="conflict-popover">
       <Header title={conflictCopy(issue).summary} severity={<Severity issue={issue} />} description={`${names} edited this sentence at the same time.`} onClose={() => actions.activate(null)} />
       {stale && <StaleNotice issue={issue} actions={actions} />}
+      {issue.conflict.model?.startsWith("Local heuristic") && (
+        <p className="review-item-note">Checked with the keyword fallback: the NLI service isn’t running.</p>
+      )}
       <div className="choice-rows">
         {versions.map(version => {
           const author = authorOf(version.authorId, version.authorName)
