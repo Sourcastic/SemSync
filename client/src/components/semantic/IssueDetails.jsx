@@ -30,11 +30,12 @@ const IMPOSSIBLE = {
   incoherent: "No longer reads as a sentence",
 }
 
-function authorOf(id) {
+function authorOf(id, savedName) {
   const known = COLLABORATORS[id]
   if (known) return known
   const short = id && id.length > 16 ? id.slice(0, 8) : (id ?? "Collaborator")
-  return { id, name: short, fullName: id, color: "var(--avatar-neutral)" }
+  const name = savedName ?? short
+  return { id, name: name.split(" ")[0] === "Anonymous" ? name : name.split(" ")[0], fullName: name, color: "var(--avatar-neutral)" }
 }
 
 // Highlights what an author changed relative to the original sentence (shared prefix/suffix trimmed).
@@ -101,7 +102,7 @@ export function ConflictDetails({ issue, actions }) {
   const { versions, merged, original, classification } = issue.conflict
   const impossible = IMPOSSIBLE[classification]
   const stale = issue.status === "stale"
-  const names = versions.map(v => authorOf(v.authorId).name).join(" and ")
+  const names = versions.map(v => authorOf(v.authorId, v.authorName).name).join(" and ")
   const now = mergedExcerpt(original, merged)
   return (
     <div className="conflict-popover">
@@ -109,7 +110,7 @@ export function ConflictDetails({ issue, actions }) {
       {stale && <StaleNotice issue={issue} actions={actions} />}
       <div className="choice-rows">
         {versions.map(version => {
-          const author = authorOf(version.authorId)
+          const author = authorOf(version.authorId, version.authorName)
           return (
             <div className="choice-row" key={version.authorId}>
               <span className="choice-row-who"><Avatar user={author} size="xs" />{author.name}</span>
@@ -146,7 +147,7 @@ export function ConflictDetails({ issue, actions }) {
         <dl>
           <dt>Before</dt><dd>{original}</dd>
           {versions.map(v => (
-            <Fragment key={v.authorId}><dt>{authorOf(v.authorId).name}</dt><dd>{v.text}</dd></Fragment>
+            <Fragment key={v.authorId}><dt>{authorOf(v.authorId, v.authorName).name}</dt><dd>{v.text}</dd></Fragment>
           ))}
           <dt>Merged</dt><dd>{merged}</dd>
         </dl>
@@ -210,7 +211,7 @@ export function IssueSummary({ issue, time }) {
       </span>
       {conflict && (
         <span className="review-item-meta">
-          {issue.conflict.versions.map(v => authorOf(v.authorId).name).join(" and ")}
+          {issue.conflict.versions.map(v => authorOf(v.authorId, v.authorName).name).join(" and ")}
         </span>
       )}
       {stale && <span className="review-item-note">May be outdated</span>}

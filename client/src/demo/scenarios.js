@@ -209,6 +209,10 @@ export function resetScenario(context, scenario) {
   simulateCollaboratorsLeaving(context)
   const restored = scenario ? restoreOriginal(context, scenario) : true
   if (scenario?.grammarMerge) restoreOriginal(context, scenario.grammarMerge)
+  // Forget stored resolutions too, or a rerun's identical conflict would count as already resolved.
+  context.handle.change(doc => {
+    for (const field of Object.keys(doc)) if (field.startsWith("resolution:")) delete doc[field]
+  })
   context.semantic.actions.clearIssues()
   return Boolean(restored)
 }

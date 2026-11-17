@@ -35,7 +35,8 @@ function buildFork(doc, fHeads, changes, byHash) {
     heads: fHeads,
     base: A.view(doc, baseHeads).text,
     merged: A.view(doc, fHeads).text,
-    // author is the change message when the peer set one (the demo does); otherwise the actor id.
+    // author is the change message when the peer set one ("id|Name" from the editor, "atika" in
+    // the demo); otherwise the actor id.
     branches: fHeads.map(head => ({
       actor: byHash.get(head)?.actor,
       author: byHash.get(head)?.message ?? null,
@@ -157,11 +158,15 @@ export function extractConflicts(fork) {
             if (r.from < base.length) return { ...r, to: r.from + 1, sentences: [...r.sentences, base[r.from]] }
             return { ...r, from: base.length - 1, to: base.length, sentences: [base[base.length - 1], ...r.sentences] }
           })
+          const who = branch => {
+            const [authorId, authorName] = (fork.branches[branch].author ?? fork.branches[branch].actor).split("|")
+            return { authorId, authorName }
+          }
           pairs.push({
             original: base.slice(from, to).join(" "),
             merged: textFor(base, widen(mergedRegions), from, to) || null,
             versions: [[x, a], [y, b]].map(([branch]) => ({
-              authorId: fork.branches[branch].author ?? fork.branches[branch].actor,
+              ...who(branch),
               text: textFor(base, widen(edits[branch]), from, to),
             })),
           })

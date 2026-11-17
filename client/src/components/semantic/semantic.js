@@ -6,7 +6,7 @@ import { semanticKey, semanticState, dispatchSemantic } from "./semanticPlugin.j
 import { findGrammarIssues } from "./grammarCheck.js"
 import { analyzeConcurrentEdits } from "./analysis.js"
 import { detectForks, extractConflicts, locateSentence } from "./concurrency.js"
-import { connectSharedResolutions, sharedKey } from "./sharedResolutions.js"
+import { connectSharedResolutions, sharedKey, resolutionField } from "./sharedResolutions.js"
 
 const GRAMMAR_DEBOUNCE_MS = 600
 const CONCURRENCY_DEBOUNCE_MS = 700
@@ -79,10 +79,10 @@ export function connectSemantic(editor, shared) {
     if (!doc) return
 
     const forks = detectForks(doc)
+    const currentText = doc.text.replace(/￼/g, "\n").replace(/\s+/g, " ")
     if (!forks.length) return
 
     const localActor = A.getActorId(doc)
-    const existingConflicts = semanticState(view.state).issues.filter(i => i.kind === "conflict")
 
     for (const fork of forks) {
       const candidates = extractConflicts(fork)
@@ -95,7 +95,12 @@ export function connectSemantic(editor, shared) {
 
         const key = conflictKey(original, mappedVersions)
         if (dismissedKeys.has(key)) continue
+        // History keeps every past fork, so after a reload old conflicts would come back. Skip those
+        // already resolved (a shared record exists) or since edited (the merged text is gone).
+        if (doc[resolutionField({ key })] || !merged || !currentText.includes(merged.replace(/\s+/g, " "))) continue
         if (pendingKeys.has(key) || analyzedKeys.has(key)) continue
+        // Read fresh each time: an earlier candidate in this pass may have just flagged the same sentence.
+        const existingConflicts = semanticState(view.state).issues.filter(i => i.kind === "conflict")
         if (existingConflicts.some(i => i.key === key || (i.conflict?.original === original && i.status === "open"))) continue
 
         pendingKeys.add(key)
