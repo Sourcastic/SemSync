@@ -1,0 +1,140 @@
+{"id": "C01", "split": "dev", "label": "contradiction", "a": "Market demand is rising this quarter.", "b": "Market demand is falling this quarter.", "category": "simple"}
+{"id": "C02", "split": "dev", "label": "contradiction", "a": "The meeting is on Tuesday.", "b": "The meeting is on Thursday.", "category": "simple"}
+{"id": "C03", "split": "dev", "label": "contradiction", "a": "The project is ahead of schedule.", "b": "The project is behind schedule.", "category": "simple"}
+{"id": "C04", "split": "dev", "label": "contradiction", "a": "Revenue increased by 10 percent.", "b": "Revenue decreased by 10 percent.", "category": "simple"}
+{"id": "C05", "split": "dev", "label": "contradiction", "a": "The server is online.", "b": "The server is offline.", "category": "simple"}
+{"id": "C06", "split": "dev", "label": "contradiction", "a": "The test passed on all devices.", "b": "The test failed on all devices.", "category": "simple"}
+{"id": "C07", "split": "dev", "label": "contradiction", "a": "Customer satisfaction improved after the update.", "b": "Customer satisfaction worsened after the update.", "category": "simple"}
+{"id": "C08", "split": "dev", "label": "contradiction", "a": "The budget was approved by the board.", "b": "The budget was rejected by the board.", "category": "simple"}
+{"id": "C09", "split": "dev", "label": "contradiction", "a": "The bridge is open to traffic.", "b": "The bridge is closed to traffic.", "category": "simple"}
+{"id": "C10", "split": "dev", "label": "contradiction", "a": "Prices will remain stable next year.", "b": "Prices will rise sharply next year.", "category": "simple"}
+{"id": "C11", "split": "test", "label": "contradiction", "a": "The deadline is in March.", "b": "The deadline is in June.", "category": "simple"}
+{"id": "C12", "split": "test", "label": "contradiction", "a": "The company hired fifty new staff.", "b": "The company laid off fifty staff.", "category": "simple"}
+{"id": "C13", "split": "test", "label": "contradiction", "a": "The patient's condition is improving.", "b": "The patient's condition is deteriorating.", "category": "simple"}
+{"id": "C14", "split": "test", "label": "contradiction", "a": "The library is open on Sundays.", "b": "The library is closed on Sundays.", "category": "simple"}
+{"id": "C15", "split": "test", "label": "contradiction", "a": "Sales were strong in the north region.", "b": "Sales were weak in the north region.", "category": "simple"}
+{"id": "C16", "split": "test", "label": "contradiction", "a": "The feature is enabled by default.", "b": "The feature is disabled by default.", "category": "simple"}
+{"id": "C17", "split": "test", "label": "contradiction", "a": "Unemployment rose last month.", "b": "Unemployment fell last month.", "category": "simple"}
+{"id": "C18", "split": "test", "label": "contradiction", "a": "The experiment confirmed the hypothesis.", "b": "The experiment disproved the hypothesis.", "category": "simple"}
+{"id": "C19", "split": "test", "label": "contradiction", "a": "All tickets are sold out.", "b": "Many tickets are still available.", "category": "simple"}
+{"id": "C20", "split": "test", "label": "contradiction", "a": "The store opens at 9 AM.", "b": "The store opens at noon.", "category": "simple"}
+{"id": "E01", "split": "dev", "label": "entailment", "a": "Sales rose sharply in May.", "b": "Sales increased significantly in May.", "category": "simple"}
+{"id": "E02", "split": "dev", "label": "entailment", "a": "The team finished the project early.", "b": "The team completed the project ahead of time.", "category": "simple"}
+{"id": "E03", "split": "dev", "label": "entailment", "a": "The meeting was cancelled.", "b": "The meeting will not take place.", "category": "simple"}
+{"id": "E04", "split": "dev", "label": "entailment", "a": "Demand for electric cars is growing quickly.", "b": "Demand for electric cars is growing.", "category": "simple"}
+{"id": "E05", "split": "dev", "label": "entailment", "a": "The new policy reduces costs for small firms.", "b": "The new policy lowers costs for small businesses.", "category": "simple"}
+{"id": "E06", "split": "dev", "label": "entailment", "a": "The software update fixed the login bug.", "b": "The login bug was fixed by the software update.", "category": "simple"}
+{"id": "E07", "split": "dev", "label": "entailment", "a": "Most customers rated the service as excellent.", "b": "Most customers were very happy with the service.", "category": "simple"}
+{"id": "E08", "split": "dev", "label": "entailment", "a": "The bridge was closed because of flooding.", "b": "Flooding caused the bridge to close.", "category": "simple"}
+{"id": "E09", "split": "dev", "label": "entailment", "a": "Profits doubled compared to last year.", "b": "Profits are higher than last year.", "category": "simple"}
+{"id": "E10", "split": "dev", "label": "entailment", "a": "The office is located in central London.", "b": "The office is in London.", "category": "simple"}
+{"id": "E11", "split": "test", "label": "entailment", "a": "She submitted the report on time.", "b": "The report was submitted on time.", "category": "simple"}
+{"id": "E12", "split": "test", "label": "entailment", "a": "The museum is free for students.", "b": "Students can enter the museum without paying.", "category": "simple"}
+{"id": "E13", "split": "test", "label": "entailment", "a": "The train was delayed by twenty minutes.", "b": "The train arrived late.", "category": "simple"}
+{"id": "E14", "split": "test", "label": "entailment", "a": "Costs fell in June.", "b": "Costs decreased in June.", "category": "simple"}
+{"id": "E15", "split": "test", "label": "entailment", "a": "The company expanded into three new markets.", "b": "The company entered new markets.", "category": "simple"}
+{"id": "E16", "split": "test", "label": "entailment", "a": "The results are statistically significant.", "b": "The results are significant.", "category": "simple"}
+{"id": "E17", "split": "test", "label": "entailment", "a": "He bought a red car.", "b": "He bought a car.", "category": "simple"}
+{"id": "E18", "split": "test", "label": "entailment", "a": "The quick brown fox jumps over the lazy dog.", "b": "A quick brown fox jumps over a lazy dog.", "category": "simple"}
+{"id": "E19", "split": "test", "label": "entailment", "a": "The app supports offline editing.", "b": "Users can edit in the app without a connection.", "category": "simple"}
+{"id": "E20", "split": "test", "label": "entailment", "a": "The council approved the new park.", "b": "The new park was approved by the council.", "category": "simple"}
+{"id": "N01", "split": "dev", "label": "neutral", "a": "The meeting is at 3 PM.", "b": "The meeting is on Monday.", "category": "simple"}
+{"id": "N02", "split": "dev", "label": "neutral", "a": "Sales rose in May.", "b": "Marketing spend rose in May.", "category": "simple"}
+{"id": "N03", "split": "dev", "label": "neutral", "a": "The report covers the European market.", "b": "The report was written by the finance team.", "category": "simple"}
+{"id": "N04", "split": "dev", "label": "neutral", "a": "Market demand is stable.", "b": "Supply chains are under pressure.", "category": "simple"}
+{"id": "N05", "split": "dev", "label": "neutral", "a": "The app has a new dark mode.", "b": "The app now loads faster.", "category": "simple"}
+{"id": "N06", "split": "dev", "label": "neutral", "a": "The team is based in Lahore.", "b": "The team has twelve members.", "category": "simple"}
+{"id": "N07", "split": "dev", "label": "neutral", "a": "The product launched in April.", "b": "The product is popular with students.", "category": "simple"}
+{"id": "N08", "split": "dev", "label": "neutral", "a": "The hotel has a pool.", "b": "The hotel is near the airport.", "category": "simple"}
+{"id": "N09", "split": "dev", "label": "neutral", "a": "Costs fell in June.", "b": "Staff numbers grew in June.", "category": "simple"}
+{"id": "N10", "split": "dev", "label": "neutral", "a": "The CEO gave a speech at the conference.", "b": "The CEO answered questions about dividends.", "category": "simple"}
+{"id": "N11", "split": "test", "label": "neutral", "a": "The library added new books.", "b": "The library hired a new manager.", "category": "simple"}
+{"id": "N12", "split": "test", "label": "neutral", "a": "The survey had 500 responses.", "b": "The survey was conducted online.", "category": "simple"}
+{"id": "N13", "split": "test", "label": "neutral", "a": "The building has solar panels.", "b": "The building was renovated in 2020.", "category": "simple"}
+{"id": "N14", "split": "test", "label": "neutral", "a": "The course runs for ten weeks.", "b": "The course is taught in English.", "category": "simple"}
+{"id": "N15", "split": "test", "label": "neutral", "a": "The new phone has a larger screen.", "b": "The new phone comes in three colours.", "category": "simple"}
+{"id": "N16", "split": "test", "label": "neutral", "a": "Exports to China increased.", "b": "Exports to China were discussed at the summit.", "category": "simple"}
+{"id": "N17", "split": "test", "label": "neutral", "a": "The bus route was extended.", "b": "Bus fares were reviewed this year.", "category": "simple"}
+{"id": "N18", "split": "test", "label": "neutral", "a": "The concert starts at 8 PM.", "b": "The concert is sold out.", "category": "simple"}
+{"id": "N19", "split": "test", "label": "neutral", "a": "The museum opened a new wing.", "b": "The museum is popular with tourists.", "category": "simple"}
+{"id": "N20", "split": "test", "label": "neutral", "a": "The study used a small sample.", "b": "The study was published in 2024.", "category": "simple"}
+{"id": "X01", "split": "dev", "category": "negation", "label": "contradiction", "base": "The new release fixes the memory leak.", "a": "The new release fixes the memory leak completely.", "b": "The new release does not fix the memory leak."}
+{"id": "X02", "split": "test", "category": "negation", "label": "contradiction", "base": "The vendor accepted our terms.", "a": "The vendor accepted our revised terms.", "b": "The vendor did not accept our terms."}
+{"id": "X03", "split": "dev", "category": "negation", "label": "contradiction", "base": "The library is accessible to wheelchair users.", "a": "The library is fully accessible to wheelchair users.", "b": "The library is not accessible to wheelchair users."}
+{"id": "X04", "split": "test", "category": "negation", "label": "contradiction", "base": "Remote work is allowed for all staff.", "a": "Remote work is allowed for all staff on Fridays.", "b": "Remote work is no longer allowed for staff."}
+{"id": "X05", "split": "dev", "category": "negation", "label": "contradiction", "base": "The results support our hypothesis.", "a": "The results strongly support our hypothesis.", "b": "The results do not support our hypothesis."}
+{"id": "X06", "split": "test", "category": "negation", "label": "contradiction", "base": "The contract includes a termination clause.", "a": "The contract includes a 30-day termination clause.", "b": "The contract has no termination clause."}
+{"id": "X07", "split": "dev", "category": "negation", "label": "contradiction", "base": "Students may use calculators in the exam.", "a": "Students may use basic calculators in the exam.", "b": "Students may not use calculators in the exam."}
+{"id": "X08", "split": "test", "category": "negation", "label": "contradiction", "base": "The bug appears on Android devices.", "a": "The bug appears only on older Android devices.", "b": "The bug never appears on Android devices."}
+{"id": "X09", "split": "dev", "category": "numbers", "label": "contradiction", "base": "Revenue grew by 12 percent this year.", "a": "Revenue grew by 12 percent this year, driven by exports.", "b": "Revenue grew by 4 percent this year."}
+{"id": "X10", "split": "test", "category": "numbers", "label": "contradiction", "base": "The survey had 500 respondents.", "a": "The survey had 500 respondents from three cities.", "b": "The survey had 50 respondents."}
+{"id": "X11", "split": "dev", "category": "numbers", "label": "contradiction", "base": "The flight takes two hours.", "a": "The direct flight takes two hours.", "b": "The flight takes five hours."}
+{"id": "X12", "split": "test", "category": "numbers", "label": "contradiction", "base": "The team has eight engineers.", "a": "The team has eight senior engineers.", "b": "The team has three engineers."}
+{"id": "X13", "split": "dev", "category": "numbers", "label": "contradiction", "base": "The product costs 40 dollars.", "a": "The basic product costs 40 dollars.", "b": "The product costs 90 dollars."}
+{"id": "X14", "split": "test", "category": "numbers", "label": "contradiction", "base": "Only 10 percent of users enabled the feature.", "a": "Only 10 percent of users enabled the new feature.", "b": "Over 80 percent of users enabled the feature."}
+{"id": "X15", "split": "dev", "category": "numbers", "label": "contradiction", "base": "The building has twelve floors.", "a": "The office building has twelve floors.", "b": "The building has four floors."}
+{"id": "X16", "split": "test", "category": "numbers", "label": "contradiction", "base": "Delivery takes three working days.", "a": "Standard delivery takes three working days.", "b": "Delivery takes three weeks."}
+{"id": "X17", "split": "dev", "category": "phrase-opposite", "label": "contradiction", "base": "The company hired new staff in March.", "a": "The company hired thirty new staff in March.", "b": "The company laid off staff in March."}
+{"id": "X18", "split": "test", "category": "phrase-opposite", "label": "contradiction", "base": "The startup is making a profit.", "a": "The startup is making a small profit.", "b": "The startup is losing money."}
+{"id": "X19", "split": "dev", "category": "phrase-opposite", "label": "contradiction", "base": "The proposal won the committee's support.", "a": "The proposal won strong support from the committee.", "b": "The committee voted against the proposal."}
+{"id": "X20", "split": "test", "category": "phrase-opposite", "label": "contradiction", "base": "The river level is rising after the storm.", "a": "The river level is rising quickly after the storm.", "b": "The river level is going down after the storm."}
+{"id": "X21", "split": "dev", "category": "phrase-opposite", "label": "contradiction", "base": "The client renewed the contract.", "a": "The client renewed the contract for two years.", "b": "The client cancelled the contract."}
+{"id": "X22", "split": "test", "category": "phrase-opposite", "label": "contradiction", "base": "The road is safe for cyclists.", "a": "The new road is safe for cyclists.", "b": "The road is dangerous for cyclists."}
+{"id": "X23", "split": "dev", "category": "phrase-opposite", "label": "contradiction", "base": "Our market share is growing.", "a": "Our market share is growing steadily.", "b": "Our market share is shrinking."}
+{"id": "X24", "split": "test", "category": "phrase-opposite", "label": "contradiction", "base": "The patient was discharged on Monday.", "a": "The patient was discharged early on Monday.", "b": "The patient was admitted to intensive care on Monday."}
+{"id": "X25", "split": "dev", "category": "time", "label": "contradiction", "base": "The launch happens before the conference.", "a": "The product launch happens before the conference.", "b": "The launch happens after the conference."}
+{"id": "X26", "split": "test", "category": "time", "label": "contradiction", "base": "The shop is open in the morning.", "a": "The shop is open early in the morning.", "b": "The shop only opens in the evening."}
+{"id": "X27", "split": "dev", "category": "time", "label": "contradiction", "base": "The policy took effect last year.", "a": "The new policy took effect last year.", "b": "The policy has not taken effect yet."}
+{"id": "X28", "split": "test", "category": "time", "label": "contradiction", "base": "The trial ended in 2021.", "a": "The clinical trial ended in 2021.", "b": "The trial is still running."}
+{"id": "X29", "split": "dev", "category": "time", "label": "contradiction", "base": "Payments are made monthly.", "a": "Payments are made monthly by bank transfer.", "b": "Payments are made once a year."}
+{"id": "X30", "split": "test", "category": "time", "label": "contradiction", "base": "The report was finished yesterday.", "a": "The final report was finished yesterday.", "b": "The report has not been started."}
+{"id": "X31", "split": "dev", "category": "quantifier", "label": "contradiction", "base": "All branches reported higher sales.", "a": "All branches reported higher sales in May.", "b": "None of the branches reported higher sales."}
+{"id": "X32", "split": "test", "category": "quantifier", "label": "contradiction", "base": "Every participant completed the course.", "a": "Every participant completed the online course.", "b": "No participant completed the course."}
+{"id": "X33", "split": "dev", "category": "quantifier", "label": "contradiction", "base": "Most reviewers liked the design.", "a": "Most reviewers liked the new design.", "b": "Hardly any reviewers liked the design."}
+{"id": "X34", "split": "test", "category": "quantifier", "label": "contradiction", "base": "Both servers are running.", "a": "Both backup servers are running.", "b": "Neither server is running."}
+{"id": "X35", "split": "dev", "category": "quantifier", "label": "contradiction", "base": "Everyone in the team agreed with the plan.", "a": "Everyone in the team agreed with the revised plan.", "b": "Nobody in the team agreed with the plan."}
+{"id": "X36", "split": "dev", "category": "certainty", "label": "contradiction", "base": "The meeting will definitely go ahead.", "a": "The meeting will definitely go ahead on Friday.", "b": "The meeting has been called off."}
+{"id": "X37", "split": "test", "category": "certainty", "label": "contradiction", "base": "The bridge is certain to open in June.", "a": "The new bridge is certain to open in June.", "b": "The bridge will not open in June."}
+{"id": "X38", "split": "dev", "category": "certainty", "label": "contradiction", "base": "The tool is required for all projects.", "a": "The tool is required for all new projects.", "b": "The tool is optional for all projects."}
+{"id": "X39", "split": "test", "category": "certainty", "label": "contradiction", "base": "Attendance is mandatory.", "a": "Attendance at the workshop is mandatory.", "b": "Attendance is voluntary."}
+{"id": "X40", "split": "dev", "category": "certainty", "label": "contradiction", "base": "The data is publicly available.", "a": "The anonymised data is publicly available.", "b": "The data is kept private."}
+{"id": "X41", "split": "dev", "category": "compatible-edits", "label": "neutral", "base": "Sales rose in May.", "a": "Sales rose sharply in May.", "b": "Sales rose in May across Europe."}
+{"id": "X42", "split": "test", "category": "compatible-edits", "label": "neutral", "base": "The team released an update.", "a": "The team released a security update.", "b": "The team released an update on Monday."}
+{"id": "X43", "split": "dev", "category": "compatible-edits", "label": "neutral", "base": "Demand for housing is growing.", "a": "Demand for housing is growing in Lahore.", "b": "Demand for housing is growing quickly."}
+{"id": "X44", "split": "test", "category": "compatible-edits", "label": "neutral", "base": "The museum opened a new gallery.", "a": "The museum opened a new modern art gallery.", "b": "The museum opened a new gallery last week."}
+{"id": "X45", "split": "dev", "category": "compatible-edits", "label": "neutral", "base": "Our app has new users.", "a": "Our app has many new users.", "b": "Our app has new users in Canada."}
+{"id": "X46", "split": "test", "category": "compatible-edits", "label": "neutral", "base": "The council approved the budget.", "a": "The council approved the budget unanimously.", "b": "The council approved the budget for schools."}
+{"id": "X47", "split": "dev", "category": "compatible-edits", "label": "neutral", "base": "Prices increased this month.", "a": "Fuel prices increased this month.", "b": "Prices increased slightly this month."}
+{"id": "X48", "split": "test", "category": "compatible-edits", "label": "neutral", "base": "The study found a link between sleep and memory.", "a": "The large study found a link between sleep and memory.", "b": "The study found a strong link between sleep and memory."}
+{"id": "X49", "split": "dev", "category": "compatible-edits", "label": "neutral", "base": "The company opened an office.", "a": "The company opened an office in Dubai.", "b": "The company opened a second office."}
+{"id": "X50", "split": "test", "category": "compatible-edits", "label": "neutral", "base": "Traffic was heavy this morning.", "a": "Traffic was heavy on the motorway this morning.", "b": "Traffic was heavy this morning because of rain."}
+{"id": "X51", "split": "dev", "category": "compatible-edits", "label": "neutral", "base": "The students presented their project.", "a": "The final-year students presented their project.", "b": "The students presented their project to the board."}
+{"id": "X52", "split": "test", "category": "compatible-edits", "label": "neutral", "base": "The website was redesigned.", "a": "The website was redesigned for mobile users.", "b": "The company website was redesigned in April."}
+{"id": "X53", "split": "dev", "category": "paraphrase", "label": "entailment", "base": "The order was shipped today.", "a": "The order was dispatched today.", "b": "Today the order was shipped."}
+{"id": "X54", "split": "test", "category": "paraphrase", "label": "entailment", "base": "The manager approved the request.", "a": "The request was approved by the manager.", "b": "The manager gave approval for the request."}
+{"id": "X55", "split": "dev", "category": "paraphrase", "label": "entailment", "base": "The price of oil went up.", "a": "Oil prices went up.", "b": "The price of oil increased."}
+{"id": "X56", "split": "test", "category": "paraphrase", "label": "entailment", "base": "The event was postponed.", "a": "The event was moved to a later date.", "b": "The event has been postponed."}
+{"id": "X57", "split": "dev", "category": "paraphrase", "label": "entailment", "base": "The firm made a large profit.", "a": "The firm earned a big profit.", "b": "The firm made a substantial profit."}
+{"id": "X58", "split": "test", "category": "paraphrase", "label": "entailment", "base": "He resigned from his job.", "a": "He quit his job.", "b": "He left his job voluntarily."}
+{"id": "X59", "split": "dev", "category": "paraphrase", "label": "entailment", "base": "The children are asleep.", "a": "The children are sleeping.", "b": "The kids are asleep."}
+{"id": "X60", "split": "test", "category": "paraphrase", "label": "entailment", "base": "The shop sells second-hand books.", "a": "The shop sells used books.", "b": "Second-hand books are sold at the shop."}
+{"id": "X61", "split": "dev", "category": "paraphrase", "label": "entailment", "base": "The road was closed for repairs.", "a": "The road was shut for repairs.", "b": "Repairs caused the road to be closed."}
+{"id": "X62", "split": "test", "category": "paraphrase", "label": "entailment", "base": "Attendance has dropped.", "a": "Fewer people are attending.", "b": "Attendance has gone down."}
+{"id": "X63", "split": "dev", "category": "generalisation", "label": "entailment", "base": "The company sells electric cars.", "a": "The company sells electric cars in Europe.", "b": "The company sells cars."}
+{"id": "X64", "split": "test", "category": "generalisation", "label": "entailment", "base": "She visited Paris last summer.", "a": "She visited Paris and Rome last summer.", "b": "She travelled to France last summer."}
+{"id": "X65", "split": "dev", "category": "generalisation", "label": "entailment", "base": "The team won the final.", "a": "The team won the final 3-1.", "b": "The team won a match."}
+{"id": "X66", "split": "test", "category": "generalisation", "label": "entailment", "base": "Our office uses solar power.", "a": "Our office uses solar power for heating.", "b": "Our office uses renewable energy."}
+{"id": "X67", "split": "dev", "category": "generalisation", "label": "entailment", "base": "The dog chased a cat.", "a": "The dog chased a black cat.", "b": "The dog chased an animal."}
+{"id": "X68", "split": "test", "category": "generalisation", "label": "entailment", "base": "He drinks coffee every morning.", "a": "He drinks black coffee every morning.", "b": "He drinks coffee."}
+{"id": "X69", "split": "dev", "category": "topic-shift", "label": "neutral", "base": "Market demand is stable.", "a": "Market demand is stable this quarter.", "b": "Market supply is under pressure."}
+{"id": "X70", "split": "test", "category": "topic-shift", "label": "neutral", "base": "The hospital is busy.", "a": "The hospital is busy at night.", "b": "The hospital is hiring nurses."}
+{"id": "X71", "split": "dev", "category": "topic-shift", "label": "neutral", "base": "The new phone is expensive.", "a": "The new phone is very expensive.", "b": "The new phone is popular."}
+{"id": "X72", "split": "test", "category": "topic-shift", "label": "neutral", "base": "The river is clean.", "a": "The river is clean upstream.", "b": "The river is wide."}
+{"id": "X73", "split": "dev", "category": "topic-shift", "label": "neutral", "base": "Inflation is high.", "a": "Inflation is high in the region.", "b": "Interest rates are rising."}
+{"id": "X74", "split": "test", "category": "topic-shift", "label": "neutral", "base": "The school has a new principal.", "a": "The school has a new principal from Karachi.", "b": "The school has a new library."}
+{"id": "X75", "split": "dev", "category": "topic-shift", "label": "neutral", "base": "The CEO is confident about growth.", "a": "The CEO is confident about growth next year.", "b": "The board is reviewing the CEO's pay."}
+{"id": "X76", "split": "test", "category": "topic-shift", "label": "neutral", "base": "The city is crowded in summer.", "a": "The city is very crowded in summer.", "b": "The city is hot in summer."}
+{"id": "X77", "split": "dev", "category": "topic-shift", "label": "neutral", "base": "The software is easy to install.", "a": "The software is easy to install on Windows.", "b": "The software is free for students."}
+{"id": "X78", "split": "test", "category": "topic-shift", "label": "neutral", "base": "The factory produces steel.", "a": "The factory produces high-grade steel.", "b": "The factory employs 300 workers."}
+{"id": "X79", "split": "dev", "category": "topic-shift", "label": "neutral", "base": "The weather was cold on Monday.", "a": "The weather was very cold on Monday.", "b": "The trains were late on Monday."}
+{"id": "X80", "split": "test", "category": "topic-shift", "label": "neutral", "base": "Exports to China increased.", "a": "Exports to China increased last year.", "b": "Imports from China were steady."}
