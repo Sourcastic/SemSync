@@ -27,6 +27,10 @@ const cases = [
     merged: "Sales rose sharply in May. Costs fell slightly in June.", pairs: 0 },
   { id: "TC-L2-05", name: "Only one user edits: no fork",
     base: "Hello world.", a: "Hello there world.", b: "Hello world.", merged: "Hello there world.", pairs: 0, fork: false },
+  { id: "TC-L2-07", name: "Conflict found when one user also adds a sentence",
+    base: "Intro. Demand is stable and level.",
+    a: "New line. Intro. Demand is skyrocketing and level.", b: "Intro. Demand is stable and plummeting.",
+    merged: "New line. Intro. Demand is skyrocketing and plummeting.", pairs: 1, original: "Demand is stable and level." },
 ]
 
 let failed = 0
@@ -39,7 +43,7 @@ for (const c of cases) {
     const pairs = fork ? extractConflicts(fork) : []
     assert.equal(pairs.length, c.pairs, "pair count")
     if (c.pairs) {
-      assert.equal(pairs[0].original, c.base, "original sentence")
+      assert.equal(pairs[0].original, c.original ?? c.base, "original sentence")
       assert.deepEqual(pairs[0].versions.map(v => v.authorId).sort(), ["atika", "ibrahim"], "authors")
     }
     console.log(`PASS ${c.id} ${c.name}`)
